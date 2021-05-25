@@ -71,9 +71,8 @@ nLinks = 0
 idEdge = 0
 nodes = []
 edges = []
+
 #=======================================================================================================================
-
-
 from scipy.spatial import distance
 import math
 with open(file, 'r') as nodes_lines:
