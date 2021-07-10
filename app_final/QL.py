@@ -41,8 +41,8 @@ class QL:
     min_exploration_rate = 0.01
     exploration_decay_rate = 0.01
 
-    read = np.genfromtxt("/home/anderson/Dropbox/posGraduacao/doutorado/qualis_paper/dataS/seedDisponibles.csv",
-                         delimiter=";").astype(int)
+    # read = np.genfromtxt("/home/anderson/Dropbox/posGraduacao/doutorado/qualis_paper/dataS/seedDisponibles.csv",
+    #                      delimiter=";").astype(int)
     seed = 1
     QLEgreedymatrixSteToEP = np.zeros(shape=(seed, num_episodes + 1), dtype=int)
     QLSimplematrixSteToEP = np.zeros(shape=(seed, num_episodes + 1), dtype=int)
