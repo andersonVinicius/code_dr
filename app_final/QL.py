@@ -142,7 +142,7 @@ class QL:
         # print('Criou o Env!')
 
 
-    def start(self):
+    def start_egreed(self):
         # print('Start process ql')
         # ======================================================================================
         # Q_learning e-greedy===================================================================
