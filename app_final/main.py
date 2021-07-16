@@ -66,7 +66,7 @@ def positionUav(lat1,long1,lat2,long2,distEnlace,tecAcessMax):
 
 
 #variaveis da topologia ================================================================================================
-file='../../../../tccDaFernanda/stockholm.txt'
+file='stockholm.txt'
 name ='stockholm'
 graph = nx.DiGraph(name=name) # DiGraph because we have two fibers (one each way) between any pair of nodes
 nNodes = 0
