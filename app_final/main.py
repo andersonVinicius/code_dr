@@ -291,6 +291,7 @@ for i in range(len(pontoDePartidaUavDistance[:,0])):
             segm = int(np.ceil(s/(vUav * 50)))
             percentAumentoDist = []
             segmVdsolo = []
+            sumPath = 0
             for z in range(segm):
                 #criar instancia do Objeto Q-leaning
                 ql = QL(np)
@@ -324,17 +325,13 @@ for i in range(len(pontoDePartidaUavDistance[:,0])):
 
                    else:
 
-                    p1 = (ql.env[ path[k] ].x_init,ql.env[ path[k] ] .y_init)
-                    p2 = (ql.env[ path[k+1] ].x_init,ql.env[path[k+1]].y_init)
-                    d += distAPI.euclidean(p1, p2)
+                       d += vUav # o quanto o UAV desloca por segundo
 
+                #guardar todas as quantidade de path por segmento
+                sumPath += (len(path)-1)
 
-
-
-                p1 = (ql.env[ ql.init_space ].x_init,ql.env[ ql.init_space ].y_init)
-                p2 = (ql.env[ ql.state_obj ].x_init,ql.env[ql.state_obj].y_init)
-                d2 = distAPI.euclidean(p1, p2)
-                percentAumentoDist.append( d2/d )
+            d2 = vUav * sumPath
+            percentAumentoDist.append( d2/d )
 
             #testelklplp
 
