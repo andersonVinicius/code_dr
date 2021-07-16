@@ -4,6 +4,7 @@ import csv
 import networkx as nx
 from geographiclib.geodesic import Geodesic
 from QL import QL
+from scipy.spatial import distance as distAPI
 
 def calTime(va, payload, battery,np):
     Cd = 0.54  # drag coefficient
@@ -73,7 +74,6 @@ nodes = []
 edges = []
 
 #=======================================================================================================================
-from scipy.spatial import distance
 import math
 with open(file, 'r') as nodes_lines:
     for idx, line in enumerate(nodes_lines):
@@ -307,11 +307,11 @@ for i in range(len(pontoDePartidaUavDistance[:,0])):
 
                     p1 = (ql.env[ path[k] ].x_init,ql.env[ path[k] ] .y_init)
                     p2 = (ql.env[ path[k+1] ].x_init,ql.env[path[k+1]].y_init)
-                    d += distance.euclidean(p1, p2)
+                    d += distAPI.euclidean(p1, p2)
 
                 p1 = (ql.env[ ql.init_space ].x_init,ql.env[ ql.init_space ].y_init)
                 p2 = (ql.env[ ql.state_obj ].x_init,ql.env[ql.state_obj].y_init)
-                d2 = distance.euclidean(p1, p2)
+                d2 = distAPI.euclidean(p1, p2)
                 percentAumentoDist.append( d2/d )
 
             pontoDePartidaUavWindSpeed[i,j] = np.mean(wind)
