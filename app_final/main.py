@@ -336,7 +336,7 @@ for i in range(len(pontoDePartidaUavDistance[:,0])):
                 d2 = distAPI.euclidean(p1, p2)
                 percentAumentoDist.append( d2/d )
 
-            #teste
+            #testelkl
 
             pontoDePartidaUavWindSpeed[i,j] = np.mean(wind)
             pontoDePartidaUavNewDistace[i,j] = (s*(1+np.mean( percentAumentoDist)))
