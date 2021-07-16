@@ -1,10 +1,7 @@
 
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
+
 from Grid_space2 import Grid_space2
 import operator
-import random
-import matplotlib.pyplot as plt
 from RL_2 import Egreedy, SimpleQL, Sarsa
 import numpy as np
 
