@@ -328,10 +328,15 @@ for i in range(len(pontoDePartidaUavDistance[:,0])):
                     p2 = (ql.env[ path[k+1] ].x_init,ql.env[path[k+1]].y_init)
                     d += distAPI.euclidean(p1, p2)
 
+
+
+
                 p1 = (ql.env[ ql.init_space ].x_init,ql.env[ ql.init_space ].y_init)
                 p2 = (ql.env[ ql.state_obj ].x_init,ql.env[ql.state_obj].y_init)
                 d2 = distAPI.euclidean(p1, p2)
                 percentAumentoDist.append( d2/d )
+
+            #teste
 
             pontoDePartidaUavWindSpeed[i,j] = np.mean(wind)
             pontoDePartidaUavNewDistace[i,j] = (s*(1+np.mean( percentAumentoDist)))
