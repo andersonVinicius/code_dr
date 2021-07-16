@@ -335,16 +335,16 @@ for i in range(len(pontoDePartidaUavDistance[:,0])):
 
             #testelklplp
 
-            pontoDePartidaUavWindSpeed[i,j] = np.mean(wind)
-            pontoDePartidaUavNewDistace[i,j] = (s*(1+np.mean( percentAumentoDist)))
-            vp = vUav + pontoDePartidaUavWindSpeed[i,j]
-            consumerEnergyUavForMissionQLe[i,j] = energyCons2(payload,g,s,vUav,vp)/1000
-            energiaDisponivelQLe[i,j] = bateriaUAV - (2*consumerEnergyUavForMissionQLe[i,j])
-            tfQLe[i, j] = (calTime(pontoDePartidaUavWindSpeed[i,j], payload, energiaDisponivelQLe[i, j]*1000,np)) / 60
-
-meanConsumerQLe = [np.mean(consumerEnergyUavForMissionQLe[i,np.nonzero(consumerEnergyUavForMissionQLe[i,:])]) for i in range(12)]
-meanTimeOperationQLe = [np.mean(tfQLe[i,np.nonzero(tfQLe[i,:])]) for i in range(len(tfQLe[:,0]))]
-meanDistanceRun = [np.mean(pontoDePartidaUavNewDistace[i,np.nonzero(pontoDePartidaUavNewDistace[i,:])]) for i in range(12)]
+#             pontoDePartidaUavWindSpeed[i,j] = np.mean(wind)
+#             pontoDePartidaUavNewDistace[i,j] = (s*(1+np.mean( percentAumentoDist)))
+#             vp = vUav + pontoDePartidaUavWindSpeed[i,j]
+#             consumerEnergyUavForMissionQLe[i,j] = energyCons2(payload,g,s,vUav,vp)/1000
+#             energiaDisponivelQLe[i,j] = bateriaUAV - (2*consumerEnergyUavForMissionQLe[i,j])
+#             tfQLe[i, j] = (calTime(pontoDePartidaUavWindSpeed[i,j], payload, energiaDisponivelQLe[i, j]*1000,np)) / 60
+#
+# meanConsumerQLe = [np.mean(consumerEnergyUavForMissionQLe[i,np.nonzero(consumerEnergyUavForMissionQLe[i,:])]) for i in range(12)]
+# meanTimeOperationQLe = [np.mean(tfQLe[i,np.nonzero(tfQLe[i,:])]) for i in range(len(tfQLe[:,0]))]
+# meanDistanceRun = [np.mean(pontoDePartidaUavNewDistace[i,np.nonzero(pontoDePartidaUavNewDistace[i,:])]) for i in range(12)]
 
 #resultados-> armazenar em arquivos 'csv'===============================================================================
 # np.savetxt("dataS/meanConsumerQLe.csv", meanConsumerQLe, delimiter=";")
