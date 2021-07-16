@@ -7,7 +7,7 @@ import numpy as np
 
 class QL:
     # reward
-    r = [-1, 1, 1000]  # yes wind - no_wind - no_windBest
+    r = [-1, 1, 90]  # yes wind - no_wind - no_windBest
 
     num_episodes = 500
     learning_rate = 0.9
@@ -19,9 +19,9 @@ class QL:
 
     # number of grids or states
     # environmente dimensions
-    xdim = 10  # meter
-    ydim = 10  # meter
-    zdim = 1  # meter
+    xdim = 20  # dimensao eixo x
+    ydim = 20  # dimensao eixo y
+    zdim = 1  # dimensao eixo z
 
     N_blocks = (xdim * ydim * zdim)
     # start state

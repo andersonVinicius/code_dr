@@ -279,6 +279,7 @@ pontoDePartidaUavWindSpeed = np.zeros((len(linksDesastre),50))
 pontoDePartidaUavNewDistace = np.zeros((len(linksDesastre),50))
 meanConsumerQLe = []
 meanTimeOperationQLe = []
+allPaths = []
 #=====================================================================
 for i in range(len(pontoDePartidaUavDistance[:,0])):
     print('Destino:',i+1)
@@ -301,6 +302,10 @@ for i in range(len(pontoDePartidaUavDistance[:,0])):
 
                 # retorne o caminho e a falha ao encontrar uma rota valida
                 path,fail = ql.findPath(egreedy_q_table,ql.init_space,ql.state_obj)
+                print(path,"sts fail:",fail)
+                allPaths.append(int(path))
+                np.savetxt("dataS/uav_" + str(i) + "_" + str(j) + "_.csv", allPaths, delimiter=";")
+
                 wind = [] # init vetor do velocidade do vento
                 dsolo = [] # init vetor da altura do UAV em relacao ao solo
 
@@ -340,9 +345,9 @@ meanTimeOperationQLe = [np.mean(tfQLe[i,np.nonzero(tfQLe[i,:])]) for i in range(
 meanDistanceRun = [np.mean(pontoDePartidaUavNewDistace[i,np.nonzero(pontoDePartidaUavNewDistace[i,:])]) for i in range(12)]
 
 #resultados-> armazenar em arquivos 'csv'===============================================================================
-np.savetxt("dataS/meanConsumerQLe.csv", meanConsumerQLe, delimiter=";")
-np.savetxt("dataS/meanTimeOperationQLe.csv", meanTimeOperationQLe, delimiter=";")
-np.savetxt("dataS/distanceRunQLe.csv", meanDistanceRun, delimiter=";")
+# np.savetxt("dataS/meanConsumerQLe.csv", meanConsumerQLe, delimiter=";")
+# np.savetxt("dataS/meanTimeOperationQLe.csv", meanTimeOperationQLe, delimiter=";")
+# np.savetxt("dataS/distanceRunQLe.csv", meanDistanceRun, delimiter=";")
 #=======================================================================================================================
 #=======================================================================================================================
 
