@@ -4,7 +4,7 @@ import csv
 import networkx as nx
 from geographiclib.geodesic import Geodesic
 from QL import QL
-from scipy.spatial import distance as distAPI
+#from scipy.spatial import distance as distAPI
 
 def calTime(va, payload, battery,np):
     Cd = 0.54  # drag coefficient
@@ -226,6 +226,7 @@ for j in linksDesastre:
 
 #variaveis gerais ======================================================================================================
 consumerEnergyUavForMission = np.zeros((len(linksDesastre),50))
+zeroPaths = np.zeros(50)
 consumerEnergyUavForMissionQLe = np.zeros((len(linksDesastre),50))
 energiaDisponivel = np.zeros((len(linksDesastre),50))
 energiaDisponivelQLe = np.zeros((len(linksDesastre),50))
@@ -280,6 +281,7 @@ pontoDePartidaUavNewDistace = np.zeros((len(linksDesastre),50))
 meanConsumerQLe = []
 meanTimeOperationQLe = []
 allPaths = []
+#allPaths.append(zeroPaths)
 #=====================================================================
 for i in range(len(pontoDePartidaUavDistance[:,0])):
     print('Destino:',i+1)
@@ -304,8 +306,10 @@ for i in range(len(pontoDePartidaUavDistance[:,0])):
                 # retorne o caminho e a falha ao encontrar uma rota valida
                 path,fail = ql.findPath(egreedy_q_table,ql.init_space,ql.state_obj)
                 print(path,"sts fail:",fail)
-                allPaths.append(int(path))
-                np.savetxt("dataS/uav_" + str(i) + "_" + str(j) + "_.csv", allPaths, delimiter=";")
+                zeroPaths = np.zeros(50)
+                zeroPaths[0:len(path)] = path
+                allPaths.append(zeroPaths)
+                np.savetxt("dataS/uav_percursoOnGrid.csv", allPaths, delimiter=";")
 
                 wind = [] # init vetor do velocidade do vento
                 dsolo = [] # init vetor da altura do UAV em relacao ao solo
@@ -333,7 +337,6 @@ for i in range(len(pontoDePartidaUavDistance[:,0])):
             d2 = vUav * sumPath
             percentAumentoDist.append( d2/d )
 
-            #testelklplp
 
 #             pontoDePartidaUavWindSpeed[i,j] = np.mean(wind)
 #             pontoDePartidaUavNewDistace[i,j] = (s*(1+np.mean( percentAumentoDist)))
