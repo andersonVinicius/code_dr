@@ -261,8 +261,7 @@ for i in range(len(pontoDePartidaUavDistance[:,0])):
             tf[i,j] = (calTime(vWindNoBuilding[2], payload, energiaDisponivel[i, j] * 1000, np)) / 60
 
 
-meanConsumer = [np.mean(consumerEnergyUavForMission[i,np.nonzero(consumerEnergyUavForMission[i,:])])
-                for i in range(12)]
+meanConsumer = [np.mean(consumerEnergyUavForMission[i,np.nonzero(consumerEnergyUavForMission[i,:])])for i in range(12)]
 meanTimeOperation = [np.mean(tf[i,np.nonzero(tf[i ,:])]) for i in range(len(tf[:,0]))]
 distanceOri = [np.mean(pontoDePartidaUavDistance[i,pontoDePartidaUavDistance[i,:]>0])
                 for i in range(12)]
@@ -283,22 +282,23 @@ meanTimeOperationQLe = []
 allPaths = []
 #allPaths.append(zeroPaths)
 #=====================================================================
-for i in range(len(pontoDePartidaUavDistance[:,0])):
+for i in range(len(pontoDePartidaUavDistance[0:1,0])):
     print('Destino:',i+1)
     for j in range (len(pontoDePartidaUavDistance[0,:])):
-        print('UAV', '['+str(i + 1)+'] ','['+str(j + 1)+'] ')
+        print('Link Optico _>', '['+str(i + 1)+'] ','UAV mission -> ['+str(j + 1)+'] ')
         s = pontoDePartidaUavDistance[i,j]*1000 #convert km to m
-
         if s>=0:
-            segm = int(np.ceil(s/(vUav * 50)))
+            segm = int(np.ceil(s/(vUav * 20)))
             percentAumentoDist = []
             segmVdsolo = []
             sumPath = 0
+            d = 0
             for z in range(segm):
                 #criar instancia do Objeto Q-leaning
                 ql = QL(np)
                 #criar ambiente a ser explorado
                 ql.creatEnv(i+j+z)
+
                 #chamar o metodo responsavel pelo Q-learning egreed
                 egreedy_q_table, egreedy_list_epsForsteps, \
                 egreedy_rewards_all_episodes, egreedy_deltas = ql.start_egreed()
@@ -318,33 +318,35 @@ for i in range(len(pontoDePartidaUavDistance[:,0])):
                 for p in path:
                     wind.append(ql.env[p].windSpeed)
                     dsolo.append(ql.env[p].altura)
-                d=0
+
 
                 for k in range(len(path)-1):
-                   #se a transicao de um estado para outro tiverem alturas diferentes
-                   if abs(dsolo[k]-dsolo[k+1]) != 0:
-
-                       #calcule a distancia euclidiana quando UAV troca de estado
-                       d+=math.sqrt((vUav**2)+ ((abs(dsolo[k]-dsolo[k+1])) ** 2))
-
-                   else:
-
-                       d += vUav # o quanto o UAV desloca por segundo
+                    #se a transicao de um estado para outro tiverem alturas diferentes
+                    if abs(dsolo[k]-dsolo[k+1]) != 0:
+                        #calcule a distancia euclidiana quando UAV troca de estado
+                        d+=math.sqrt((vUav**2) + ((abs(dsolo[k]-dsolo[k+1])) ** 2))
+                    else:
+                        d += vUav # o quanto o UAV desloca por segundo
 
                 #guardar todas as quantidade de path por segmento
-                sumPath += (len(path)-1)
-
-            d2 = vUav * sumPath
-            percentAumentoDist.append( d2/d )
+                # sumPath += (len(path)-1)
 
 
-#             pontoDePartidaUavWindSpeed[i,j] = np.mean(wind)
-#             pontoDePartidaUavNewDistace[i,j] = (s*(1+np.mean( percentAumentoDist)))
-#             vp = vUav + pontoDePartidaUavWindSpeed[i,j]
-#             consumerEnergyUavForMissionQLe[i,j] = energyCons2(payload,g,s,vUav,vp)/1000
-#             energiaDisponivelQLe[i,j] = bateriaUAV - (2*consumerEnergyUavForMissionQLe[i,j])
-#             tfQLe[i, j] = (calTime(pontoDePartidaUavWindSpeed[i,j], payload, energiaDisponivelQLe[i, j]*1000,np)) / 60
-#
+            # percentAumentoDist.append( s/d )
+
+
+            pontoDePartidaUavWindSpeed[i,j] = np.mean(wind)
+            pontoDePartidaUavNewDistace[i,j] = d
+            vp = vUav + pontoDePartidaUavWindSpeed[i,j]
+            consumerEnergyUavForMissionQLe[i,j] = energyCons2(payload,g,d,vUav,vp)/1000
+
+            energiaDisponivelQLe[i,j] = bateriaUAV - (2*consumerEnergyUavForMissionQLe[i,j])
+            tfQLe[i, j] = (calTime(pontoDePartidaUavWindSpeed[i,j], payload, energiaDisponivelQLe[i, j]*1000,np)) / 60
+
+# np.savetxt("dataS/pontoDePartidaUavWindSpeed.csv", pontoDePartidaUavWindSpeed, delimiter=";")
+# np.savetxt("dataS/pontoDePartidaUavNewDistace.csv", pontoDePartidaUavNewDistace, delimiter=";")
+# np.savetxt("dataS/pontoDePartidaUavOldDistace.csv", pontoDePartidaUavDistance, delimiter=";")
+
 # meanConsumerQLe = [np.mean(consumerEnergyUavForMissionQLe[i,np.nonzero(consumerEnergyUavForMissionQLe[i,:])]) for i in range(12)]
 # meanTimeOperationQLe = [np.mean(tfQLe[i,np.nonzero(tfQLe[i,:])]) for i in range(len(tfQLe[:,0]))]
 # meanDistanceRun = [np.mean(pontoDePartidaUavNewDistace[i,np.nonzero(pontoDePartidaUavNewDistace[i,:])]) for i in range(12)]

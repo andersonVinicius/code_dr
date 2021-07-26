@@ -7,15 +7,17 @@ import numpy as np
 
 class QL:
     # reward
-    r = [-1, 1, 90]  # yes wind - no_wind - no_windBest
+    r = [-1, 1, 100]  # yes wind - no_wind - no_windBest
 
     num_episodes = 500
     learning_rate = 0.9
     discount_rate = 0.5
     # create tab Q
     q_table = {}
-    vetWind = [6.4, 6.74, 7.02, 7.27, 7.49, 7.69, 7.86, 8.02, 8.17, 8.31, 12.32]
-    distanceSolo = [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150]
+    # vetWind = [6.4, 6.74, 7.02, 7.27, 7.49, 7.69, 7.86, 8.02, 8.17, 8.31, 12.32]
+    # distanceSolo = [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150]
+    vetWind = [6.4, 6.74, 7.02, 7.27, 7.49, 7.69]
+    distanceSolo = [50, 60, 70, 80, 90, 100]
 
     # number of grids or states
     # environmente dimensions
@@ -110,6 +112,7 @@ class QL:
         for i in range(self.xdim * self.ydim):
             id_rand = self.np.random.randint(len(self.vetWind))
             self.env[i].r = self.vetWind[10] - self.vetWind[id_rand]
+            self.env[i].r = self.vetWind[5] - self.vetWind[id_rand]
             self.env[i].altura = self.distanceSolo[id_rand]
             self.env[i].windSpeed = self.vetWind[id_rand]
 
