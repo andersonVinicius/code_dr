@@ -14,10 +14,10 @@ class QL:
     discount_rate = 0.5
     # create tab Q
     q_table = {}
-    # vetWind = [6.4, 6.74, 7.02, 7.27, 7.49, 7.69, 7.86, 8.02, 8.17, 8.31, 12.32]
-    # distanceSolo = [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150]
-    vetWind = [6.4, 6.74, 7.02, 7.27, 7.49, 7.69]
-    distanceSolo = [50, 60, 70, 80, 90, 100]
+    vetWind = [6.4, 6.74, 7.02, 7.27, 7.49, 7.69, 7.86, 8.02, 8.17, 8.31, 12.32]
+    distanceSolo = [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150]
+    # vetWind = [6.4, 6.74, 7.02, 7.27, 7.49, 7.69]
+    # distanceSolo = [50, 60, 70, 80, 90, 100]
 
     # number of grids or states
     # environmente dimensions

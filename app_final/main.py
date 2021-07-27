@@ -305,6 +305,7 @@ for i in range(len(pontoDePartidaUavDistance[0:1,0])):
 
                 # retorne o caminho e a falha ao encontrar uma rota valida
                 path,fail = ql.findPath(egreedy_q_table,ql.init_space,ql.state_obj)
+
                 print(path,"sts fail:",fail)
                 zeroPaths = np.zeros(50)
                 zeroPaths[0:len(path)] = path
