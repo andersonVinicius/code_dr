@@ -408,7 +408,6 @@ np.savetxt("dataS/pontoDePartidaUavWindSpeedNaiveSemVento.csv", pontoDePartidaUa
 np.savetxt("dataS/pontoDePartidaUavNewDistaceNaiveSemVento.csv", pontoDePartidaUavNewDistaceNaive, delimiter=";")
 np.savetxt("dataS/consumerEnergyUavForMissionQLeNaiveSemVento.csv", consumerEnergyUavForMissionQLeNaive, delimiter=";")
 
-#teste
 # np.savetxt("dataS/pontoDePartidaUavOldDistace.csv", pontoDePartidaUavDistance, delimiter=";")
 
 # meanConsumerQLe = [np.mean(consumerEnergyUavForMissionQLe[i,np.nonzero(consumerEnergyUavForMissionQLe[i,:])]) for i in range(12)]
