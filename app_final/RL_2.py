@@ -46,8 +46,6 @@ class Egreedy:
         list_epsForsteps = []
         rewards_all_episodes = []
         deltas = []
-        min_step = 99999999
-        quantTime = 0
         i = 0
         while i <= self.num_episodes:
             state = self.init_space  # init
