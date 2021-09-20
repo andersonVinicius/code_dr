@@ -58,8 +58,17 @@ class QL:
     QLSimplematrixDeltaToEP = np.zeros(shape=(seed, num_episodes + 1), dtype=int)
     SarsamatrixDeltaToEP = np.zeros(shape=(seed, num_episodes + 1), dtype=int)
 
-    def __init__(self,np):
+    def __init__(self,np,segm,seed,num_episodes,learning_rate,discount_rate):
+         self.num_episodes = num_episodes
+         self.learning_rate = learning_rate
+         self.discount_rate = discount_rate
+
          self.np = np
+         self.xdim = segm
+         self.ydim = segm
+         self.init_space = int(self.xdim / 2)
+         self.state_obj = int((self.xdim * self.ydim) - (self.xdim / 2))
+         self.creatEnv(seed)
 
     # =====================================================================
     # Find Neighborhood===================================================
@@ -112,11 +121,12 @@ class QL:
         for i in range(self.xdim * self.ydim):
             id_rand = self.np.random.randint(len(self.vetWind))
             self.env[i].r = self.vetWind[10] - self.vetWind[id_rand]
-            self.env[i].r = self.vetWind[5] - self.vetWind[id_rand]
+            # self.env[i].r = self.vetWind[5] - self.vetWind[id_rand]
             self.env[i].altura = self.distanceSolo[id_rand]
             self.env[i].windSpeed = self.vetWind[id_rand]
 
         # Find grid target =====================================================
+
         self.env[self.state_obj].r = self.r[2]
 
         # =================================================================================

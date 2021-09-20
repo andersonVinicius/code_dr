@@ -225,7 +225,6 @@ for j in linksDesastre:
 # =======================================================================================================================
 #                                        Calculo consumo de energia
 # =======================================================================================================================
-
 # variaveis gerais ======================================================================================================
 consumerEnergyUavForMission = np.zeros((len(linksDesastre), 50))
 zeroPaths = np.zeros(50)
@@ -247,50 +246,22 @@ s = 0  # distancia de voo
 vp = vUav + vWindNoBuilding[2]
 bateriaUAV = 8000  # kj
 payload = 90  # kg
-# =======================================================================================================================
 
 # =======================================================================================================================
-# =================Calculo de consumo de energia dos UAVs durante Ida/Volta [heuristica Ingenua]=========================
+# =================Calculo de consumo de energia dos UAVs durante Ida/Volta [heuristica sarsa]======================
 # =======================================================================================================================
 
-# for i in range(len(pontoDePartidaUavDistance[:, 0])):
-#     for j in range(len(pontoDePartidaUavDistance[0, :])):
-#         s = pontoDePartidaUavDistance[i, j] * 1000  # convert km to m
-#         if s >= 0:
-#             # consumerEnergyUavForMission[i, j] = calEnergy3(vUav,vp, s, payload, bateriaUAV,np)/1000
-#             consumerEnergyUavForMission[i, j] = energyCons2(payload, g, s, vUav, vp) / 1000
-#             energiaDisponivel[i, j] = bateriaUAV - (2 * consumerEnergyUavForMission[i, j])
-#             # tf[i,j] =((energiaDisponivel[i,j] * 1000)  /(m * g ))/60
-#             tf[i, j] = (calTime(vWindNoBuilding[2], payload, energiaDisponivel[i, j] * 1000, np)) / 60
-#
-# meanConsumer = [np.mean(consumerEnergyUavForMission[i, np.nonzero(consumerEnergyUavForMission[i, :])]) for i in
-#                 range(12)]
-# meanTimeOperation = [np.mean(tf[i, np.nonzero(tf[i, :])]) for i in range(len(tf[:, 0]))]
-# distanceOri = [np.mean(pontoDePartidaUavDistance[i, pontoDePartidaUavDistance[i, :] > 0])
-#                for i in range(12)]
-# # resultados-> armazenar em arquivos 'csv'===============================================================================
-# np.savetxt("dataS/meanConsumer.csv", meanConsumer, delimiter=";")
-# np.savetxt("dataS/meanTimeOperation.csv", meanTimeOperation, delimiter=";")
-# np.savetxt("dataS/distanceOri.csv", distanceOri, delimiter=";")
-
-# =======================================================================================================================
-# =================Calculo de consumo de energia dos UAVs durante Ida/Volta [heuristica QL-egreedy]======================
-# =======================================================================================================================
-
-# Variaveis para a heuristica QL-egreedy=================================================================================
+# Variaveis para a heuristica sarsa=================================================================================
 pontoDePartidaUavWindSpeed = np.zeros((len(linksDesastre), 50))
 pontoDePartidaUavWindSpeedNaive = np.zeros((len(linksDesastre), 50))
 
 pontoDePartidaUavNewDistace = np.zeros((len(linksDesastre), 50))
 pontoDePartidaUavNewDistaceNaive = np.zeros((len(linksDesastre), 50))
-n_segm=20
-meanConsumerQLe = []
-meanTimeOperationQLe = []
 
-num_episodes = 500
+n_segm=10
+num_episodes = 3000
 learning_rate = 0.9
 discount_rate = 0.5
-
 allPaths = []
 # allPaths.append(zeroPaths)
 # =====================================================================
@@ -308,48 +279,44 @@ for i in range(len(pontoDePartidaUavDistance[0:1, 0])):
             d = 0
             dNaive = 0
             for z in range(segm):
-                # criar instancia do Objeto Q-leaning
+                # criar instancia do Objeto Sarsa
                 seed = i + j + z
                 ql = QL(np,n_segm,seed,num_episodes,learning_rate,discount_rate)
-                # chamar o metodo responsavel pelo Q-learning egreed
+                # criar ambiente a ser explorado
+                # ql.creatEnv(i + j + z)
+
+                # chamar o metodo responsavel pelo Sarsa
                 egreedy_q_table, egreedy_list_epsForsteps, \
-                egreedy_rewards_all_episodes, egreedy_deltas = ql.start_egreed()
+                egreedy_rewards_all_episodes, egreedy_deltas = ql.start_sarsa()
 
                 # retorne o caminho e a falha ao encontrar uma rota valida
                 path, fail = ql.findPath(egreedy_q_table, ql.init_space, ql.state_obj)
+
+                # if fail == True:
+                #     # leitura do caminho naive
+                #     limit = 10
+                #     pathNaive.append(limit)
+                #     while limit != 390:
+                #         nextMov = ql.env[limit].actions['up']
+                #         pathNaive.append(nextMov)
+                #         limit = nextMov
+                # else:
+                #     print()
+
 
                 print(path, "sts fail:", fail)
                 zeroPaths = np.zeros(50)
                 zeroPaths[0:len(path)] = path
                 allPaths.append(zeroPaths)
-                np.savetxt("dataS/uav_percursoOnGrid.csv", allPaths, delimiter=";")
+                np.savetxt("dataSarsa/uav_percursoOnGrid.csv", allPaths, delimiter=";")
 
                 wind = []  # init vetor do velocidade do vento
                 dsolo = []  # init vetor da altura do UAV em relacao ao solo
-
-                windNaive = []  # init vetor do velocidade do vento Naive
-                dsoloNaive = []  # init vetor da altura do UAV em relacao ao solo Naive
-
-
-                pathNaive = []
-
-                #leitura do caminho naive
-                limit = 10
-                pathNaive.append(limit)
-                while limit != 390:
-                    nextMov = ql.env[limit].actions['up']
-                    pathNaive.append(nextMov)
-                    limit = nextMov
 
                 # leia e armazene os dados da altura e da velocidade do vento (Otimizado)
                 for p in path:
                     wind.append(ql.env[p].windSpeed)
                     dsolo.append(ql.env[p].altura)
-
-                # leia e armazene os dados da altura e da velocidade do vento (NAIVE)
-                for p in pathNaive:
-                    windNaive.append(ql.env[p].windSpeed)
-                    dsoloNaive.append(ql.env[p].altura)
 
                 #Otimizado------------>
                 for k in range(len(path) - 1):
@@ -359,20 +326,6 @@ for i in range(len(pontoDePartidaUavDistance[0:1, 0])):
                         d += math.sqrt((vUav ** 2) + ((abs(dsolo[k] - dsolo[k + 1])) ** 2))
                     else:
                         d += vUav  # o quanto o UAV desloca por segundo
-
-                #Naive ---------------->
-                for k in range(len(pathNaive) - 1):
-                    # se a transicao de um estado para outro tiverem alturas diferentes
-                    if abs(dsoloNaive[k] - dsoloNaive[k + 1]) != 0:
-                        # calcule a distancia euclidiana quando UAV troca de estado
-                        dNaive += math.sqrt((vUav ** 2) + ((abs(dsoloNaive[k] - dsoloNaive[k + 1])) ** 2))
-                    else:
-                        dNaive += vUav  # o quanto o UAV desloca por segundo
-
-                # guardar todas as quantidade de path por segmento
-                # sumPath += (len(path)-1)
-
-            # percentAumentoDist.append( s/d )
             #Otimizado-------->
             pontoDePartidaUavWindSpeed[i, j] = np.mean(wind)
             pontoDePartidaUavNewDistace[i, j] = d
@@ -380,66 +333,9 @@ for i in range(len(pontoDePartidaUavDistance[0:1, 0])):
             vp = vUav
             consumerEnergyUavForMissionQLe[i, j] = energyCons2(payload, g, d, vUav, vp) / 1000
 
-            #NAive ------->
-            pontoDePartidaUavWindSpeedNaive[i, j] = np.mean(windNaive)
-            pontoDePartidaUavNewDistaceNaive[i, j] = dNaive
-            # vpNaive = vUav + pontoDePartidaUavWindSpeedNaive[i, j]
-            vpNaive = vUav
-            consumerEnergyUavForMissionQLeNaive[i, j] = energyCons2(payload, g, dNaive, vUav, vpNaive) / 1000
-
-            # energiaDisponivelQLe[i, j] = bateriaUAV - (2 * consumerEnergyUavForMissionQLe[i, j])
-            # tfQLe[i, j] = (calTime(pontoDePartidaUavWindSpeed[i, j], payload, energiaDisponivelQLe[i, j] * 1000,
-            #                        np)) / 60
-
-
-# #save otimizado --------------->
-# np.savetxt("dataS/pontoDePartidaUavWindSpeed.csv", pontoDePartidaUavWindSpeed, delimiter=";")
-# np.savetxt("dataS/pontoDePartidaUavNewDistace.csv", pontoDePartidaUavNewDistace, delimiter=";")
-# np.savetxt("dataS/consumerEnergyUavForMissionQLe.csv", consumerEnergyUavForMissionQLe, delimiter=";")
+# #save Sarsa otimizado --------------->
+np.savetxt("dataSarsa/pontoDePartidaUavWindSpeedSarsa.csv", pontoDePartidaUavWindSpeed, delimiter=";")
+np.savetxt("dataSarsa/pontoDePartidaUavNewDistaceSarsa.csv", pontoDePartidaUavNewDistace, delimiter=";")
+np.savetxt("dataSarsa/consumerEnergyUavForMissionQLeSarsa.csv", consumerEnergyUavForMissionQLe, delimiter=";")
 #
-# #save Naive ------------------->
-# np.savetxt("dataS/pontoDePartidaUavWindSpeedNaive.csv", pontoDePartidaUavWindSpeedNaive, delimiter=";")
-# np.savetxt("dataS/pontoDePartidaUavNewDistaceNaive.csv", pontoDePartidaUavNewDistaceNaive, delimiter=";")
-# np.savetxt("dataS/consumerEnergyUavForMissionQLeNaive.csv", consumerEnergyUavForMissionQLeNaive, delimiter=";")
-
-
-#save otimizado Sem Vento --------------->
-np.savetxt("dataS/pontoDePartidaUavWindSpeedSemVento.csv", pontoDePartidaUavWindSpeed, delimiter=";")
-np.savetxt("dataS/pontoDePartidaUavNewDistaceSemVento.csv", pontoDePartidaUavNewDistace, delimiter=";")
-np.savetxt("dataS/consumerEnergyUavForMissionQLeSemVento.csv", consumerEnergyUavForMissionQLe, delimiter=";")
-
-#save Naive Sem Vento------------------->
-np.savetxt("dataS/pontoDePartidaUavWindSpeedNaiveSemVento.csv", pontoDePartidaUavWindSpeedNaive, delimiter=";")
-np.savetxt("dataS/pontoDePartidaUavNewDistaceNaiveSemVento.csv", pontoDePartidaUavNewDistaceNaive, delimiter=";")
-np.savetxt("dataS/consumerEnergyUavForMissionQLeNaiveSemVento.csv", consumerEnergyUavForMissionQLeNaive, delimiter=";")
-
-# np.savetxt("dataS/pontoDePartidaUavOldDistace.csv", pontoDePartidaUavDistance, delimiter=";")
-
-# meanConsumerQLe = [np.mean(consumerEnergyUavForMissionQLe[i,np.nonzero(consumerEnergyUavForMissionQLe[i,:])]) for i in range(12)]
-# meanTimeOperationQLe = [np.mean(tfQLe[i,np.nonzero(tfQLe[i,:])]) for i in range(len(tfQLe[:,0]))]
-# meanDistanceRun = [np.mean(pontoDePartidaUavNewDistace[i,np.nonzero(pontoDePartidaUavNewDistace[i,:])]) for i in range(12)]
-
-# resultados-> armazenar em arquivos 'csv'===============================================================================
-# np.savetxt("dataS/meanConsumerQLe.csv", meanConsumerQLe, delimiter=";")
-# np.savetxt("dataS/meanTimeOperationQLe.csv", meanTimeOperationQLe, delimiter=";")
-# np.savetxt("dataS/distanceRunQLe.csv", meanDistanceRun, delimiter=";")
-# =======================================================================================================================
-# =======================================================================================================================
-
-
-# ============PLOT==========================================
-
-# plt.figure(figsize=(12,10))
-# y_pos = np.arange(12)
-# plt.bar(y_pos,meanConsumer)
-# plt.ylabel('Flight Energy consumption (kj)')
-# plt.xlabel('Broken links')
-# plt.title('Scenario n 12 - [going to the incidents]')
-
-# plt.figure(figsize=(12,10))
-# plt.bar(y_pos,meanTimeOperation)
-# plt.ylabel('AVG - Operation Time (min)')
-# plt.xlabel('Broken links')
-# plt.title('Disaster scenario n 12 - [during the mission]')
-# plt.show()
 

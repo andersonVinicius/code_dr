@@ -231,8 +231,6 @@ class SimpleQL:
 
             i += 1
         return self.q_table, list_epsForsteps,rewards_all_episodes, deltas
-
-
 class Sarsa:
 # variables
     num_episodes = 1000
