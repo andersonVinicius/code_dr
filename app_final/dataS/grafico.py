@@ -17,8 +17,8 @@ class grafico:
         ax = fig.add_axes([0, 0, 1, 1])
         ax.set_xlabel('xlabel')
         ax.set_ylabel('ylabel')
-        ax.bar(X + 0.00, data[0][1], color='b', width=0.25, label='Inline label')
-        ax.bar(X + 0.25, data[1][1], color='g', width=0.25, label='Inline label')
+        ax.bar(X + 0.00, data[0][1], color='b', width=0.5, label='Inline label')
+        ax.bar(X + 0.25, data[1][1], color='g', width=0.5, label='Inline label')
         #ax.bar(X + 0.50, data[2], color='r', width=0.25)
         plt.xticks(X, colum)
         plt.legend("q","n")
@@ -30,7 +30,7 @@ class grafico:
         row = []
         for z in range(len(data)):
             for i in range(len(data[0][1])):
-                row.append([data[z][0], data[z][1][i], "UAV "+str(i+1)])
+                row.append([data[z][0], data[z][1][i], str(i+1)])
         df=pd.DataFrame(row,columns = ["metodo","energy","id_uav"])
         return df
 
@@ -44,16 +44,24 @@ class grafico:
             data=df, kind="bar",
             x="id_uav", y="energy", hue="metodo",
             ci="sd", palette="dark",
-            alpha=.6, height=6, aspect=2
+            alpha=0.6, height=5, aspect=1.5, legend=False
         )
+
+        g.set_ylabels(fontsize= 15.5)
+        g.set_xlabels(fontsize=15.5)
+
         g.despine(left=True)
 
-        g.set_axis_labels("", data[0][2])
-        g.legend.set_title("")
+        g.set_axis_labels("ID UAV", data[0][2])
+
+        # g.legend.set_title("")
+        # g.legend.set_size('small')
         arqSave = data[0][2]
         arqSave = arqSave.replace('(m/s)','').replace('(j)','').replace('(m)','')
-        plt.savefig('graficos/'+arqSave+'.pdf')
 
+        plt.tick_params(axis='y', labelsize=14)
+        plt.legend(loc='upper right',ncol=2,bbox_to_anchor=(1,1.04),fontsize=14)
+        plt.savefig('graficos/'+arqSave+'.pdf')
         plt.show()
 
     def criarLineplotSeaborn(self, data):

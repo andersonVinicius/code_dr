@@ -52,12 +52,12 @@ dataDist = getValoresValidos(dataSetsDistance)
 grf1 = grf()
 #gerar graficos----------->
 #barplot energy consumed
-# grf1.criarBarplotSeaborn(data)
+grf1.criarBarplotSeaborn(data)
 
 #barplot wind speed
-# grf1.criarBarplotSeaborn(dataWind)
+grf1.criarBarplotSeaborn(dataWind)
 
 #barplot distance
-# grf1.criarBarplotSeaborn(dataDist)
+grf1.criarBarplotSeaborn(dataDist)
 #lineplot
-grf1.criarLineplotSeaborn(data)
+# grf1.criarLineplotSeaborn(data)
