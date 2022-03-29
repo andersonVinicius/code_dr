@@ -1,115 +1,96 @@
-#criar cenario
-from matplotlib import pyplot as plt
 import numpy as np
-import random
-import math
-#=====================================================>
-# Two dimensional rotation
-# returns coordinates in a tuple (x,y)
-def rotate(x, y, r):
-    rx = (x*math.cos(r)) - (y*math.sin(r))
-    ry = (y*math.cos(r)) + (x*math.sin(r))
-    return (rx, ry)
+from scipy.stats import levy
+import matplotlib.pyplot as plt
 
-# create a ring of points centered on center (x,y) with a given radius
-# using the specified number of points
-# center should be a tuple or list of coordinates (x,y)
-# returns a list of point coordinates in tuples
-# ie. [(x1,y1),(x2,y2
-def point_ring(center, num_points, radius):
-    arc = (2 * math.pi) / num_points # what is the angle between two of the points
-    points = []
-    for p in range(num_points):
-        (px,py) = rotate(0, radius, arc * p)
-        px += center[0]
-        py += center[1]
-        points.append((px,py))
-    return points
-#=====================================++>
-
-space_x = 100
-space_y = 100
-quant_blocks = 15
-space_grid = []
-id = 0
-block_off_id = np.random.randint((space_x * space_y),size=(quant_blocks));
+from matplotlib import animation
+from IPython.display import HTML
 
 
-# Espaco de posicionamento do UAV
-for x in range(space_x):
-    for y in range(space_y):
-        id = id+1
-        space_grid.append(
-            {
-                'id': id,
-                'x' : x,
-                'y' : y,
-                'block': 1 if (True==id in block_off_id) else 0
-            }
-        )
-        id = id + 1
-#quantidades de UAVs
-ND_max = 10 #numero de UAVs
-pop = 100 #populacao
-matrix_UAVs = np.zeros((pop,(ND_max+1)*3)) #matrix de processamento
-dim_x = 1000 #dimensao eixo x
-dim_y = 1000 #dimensao eixo y
-dim_z_max = 120 #altura maxima
-dim_z_min = 30 #altura minima
+class FPA():
+    def __init__(self, switch_probability=0.8, n_flowers=50, n_parameters=2, constraints=None):
+        # Initialization of variables
+        self.sp = switch_probability
+        self.n_flowers = n_flowers
+        self.flowers = [None] * n_flowers
+        self.cost = np.zeros(n_flowers)
+        self.random = np.random
+        self.n_parameters = n_parameters
+        self.const = constraints
 
-posOPtoWire_A_x = 0
-posOPtoWire_A_y = 0
-posOPtoWire_A_z = 35
+        # Random Initial Flowers
+        self.init_flowers()
+        # Get the best flower from initial population
+        self.best = self.flowers[self.cost.argmin()]
 
-posOPtoWire_B_x = 0
-posOPtoWire_B_y = 0
-posOPtoWire_B_z = 35
+    def Six_Hump_Camel(self, x):  # This is the objective function, modify this according to your needs.
+        output = (4 - 2.1 * (x[0] ** 2) + (x[0] ** 4) / 3) * x[0] ** 2 + x[0] * x[1] + (-4 + 4 * x[1] ** 2) * x[1] ** 2
+        return output
 
+    def global_pollination(self, x):  # Global pollination
+        x_new = x + levy.rvs(size=x.shape[0]) * (self.best - x)
+        return x_new
 
-enlace = 300 #m
-for i in range(pop):
-    ND = np.random.randint(8, ND_max)
-    matrix_UAVs[i, 0] = ND
-    range_sort = 100
-    origem_x = posOPtoWire_A_x
-    origem_y = posOPtoWire_A_y
-    for j in range(1,(ND+1)*3,3):
-        print(j)
-        coord = point_ring((origem_x, origem_y), range_sort, enlace)
-        x=[]
-        y=[]
-        cont = 0
-        for tuple in coord:
-            #verificar numeros fora do range do cenario
-            if (tuple[0] > 0 and tuple[0] <= dim_x and tuple[1] >0 and tuple[1]<= dim_y ):
-                x.append(tuple[0])
-                y.append(tuple[1])
+    def local_pollination(self, x, x1, x2):  # Local Pollination
+        x_new = x + self.random.randn() * (x1 - x2)
+        return x_new
 
-        # dentre as possiblidade, escolha um
-        eleito = np.random.randint(len(x))
-        proximo_x =  x[eleito]
-        proximo_y =  y[eleito]
-        matrix_UAVs[i,j] = proximo_x # escolha o x
-        matrix_UAVs[i, j+1] = proximo_y # escolha o y
-        matrix_UAVs[i, j+2] = 50 # escolha o z
-        # atribua o proximo ponto a origem
-        origem_x = proximo_x
-        origem_y = proximo_y
+    def init_flowers(self):  # Initialization of flowers
+        for i in range(self.n_flowers):
+            self.flowers[i] = self.random.rand(self.n_parameters)
+            for j in range(self.n_parameters):
+                if self.const is not None:
+                    self.flowers[i][j] = self.flowers[i][j] * (self.const[j][1] - self.const[j][0]) + self.const[j][0]
+                else:
+                    self.flowers[i][j] = self.flowers[i][j] * 100 - 50
+            self.cost[i] = self.Six_Hump_Camel(self.flowers[i])
 
-print('fim')
+    def optimize(self, max_gen=100):
+        # Save history for plotting
+        history = np.zeros((max_gen, self.n_parameters))
 
-from matplotlib import pyplot as plt
-# coord = point_ring((150,150),100,300)
-# x=[]
-# y=[]
-#
-# for tuple in coord:
-#     x.append(tuple[0])
-#     y.append(tuple[1])
-#
-for j in range(1,33,3):
-        print(j)
-        plt.plot(matrix_UAVs[0,j], matrix_UAVs[0,j+1],marker='*')
+        # Generation loop
+        for i in range(max_gen):
+            history[i, :] = self.best  # Update history
 
-plt.plot(matrix_UAVs[0,range(1,33,3)],matrix_UAVs[0,range(2,33,3)], linestyle = 'dotted')
-plt.show()
+            # Flower loop
+            for j in range(self.n_flowers):
+                p = self.random.rand()
+
+                # Global Pollination if p <= switch probability
+                if p <= self.sp:
+                    x_temp = self.global_pollination(self.flowers[j])
+
+                # Local Pollination if p > switch probability
+                else:
+                    r1 = self.random.randint(0, high=self.n_flowers)
+                    r2 = self.random.randint(0, high=self.n_flowers)
+                    while r2 == r1:
+                        r2 = self.random.randint(0, high=self.n_flowers)
+                    x_temp = self.local_pollination(self.flowers[j], self.flowers[r1], self.flowers[r2])
+
+                # Apply constraints
+                if self.const is not None:
+                    for k in range(self.n_parameters):
+                        x_temp = np.clip(x_temp, self.const[k][0], self.const[k][1])
+                else:
+                    continue
+
+                # Calculate cost
+                cost_temp = self.Six_Hump_Camel(x_temp)
+
+                # Compare the newly generated flower with the previous flower
+                if cost_temp < self.cost[j]:
+                    self.flowers[j] = x_temp
+                    self.cost[j] = cost_temp
+                else:
+                    continue
+
+            # Update best
+            self.best = self.flowers[self.cost.argmin()]
+
+        return self.flowers, self.cost, history
+
+const = [np.array([-2.5, 2.5]), np.array([-1.5, 1.5])]
+FPA = FPA(switch_probability = 0.6, n_flowers = 5, n_parameters = 2, constraints = const)
+result, cost, hist = FPA.optimize(25)
+result[cost.argmin()]
