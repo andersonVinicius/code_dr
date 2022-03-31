@@ -1,5 +1,6 @@
 #criar cenario
 from matplotlib import pyplot as plt
+from FPA_UAV import FPA
 import numpy as np
 import random
 import math
@@ -53,7 +54,8 @@ class Cenario:
             #quantidades de UAVs
             ND_max = 10 #numero de UAVs
             pop = 100 #populacao
-            quantPositions = 1+(ND_max*3)+3
+            n_variaveis = 3
+            quantPositions = (ND_max*n_variaveis)
             matrix_UAVs = np.zeros((pop,quantPositions)) #matrix de processamento
             dim_x = 1000 #dimensao eixo x
             dim_y = 1000 #dimensao eixo y
@@ -72,12 +74,12 @@ class Cenario:
             enlace = 300 #m
             for i in range(pop):
                 ND = 10
-                matrix_UAVs[i, 0] = ND  #atribua o quantidade de UAVs
+                # matrix_UAVs[i, 0] = ND  #atribua o quantidade de UAVs
                 range_sort = 100
                 origem_x = posOPtoWire_A_x
                 origem_y = posOPtoWire_A_y
 
-                for j in range(1,(ND)*3,3):
+                for j in range(0,(ND)*n_variaveis,3):
 
                     coord = self.point_ring((origem_x, origem_y), range_sort, enlace)
                     x=[]
@@ -115,4 +117,8 @@ class Cenario:
 #teste
 c = Cenario()
 flowers = c.create()
+const = [np.array([-2.5, 2.5]), np.array([-1.5, 1.5])]
+FPA = FPA(switch_probability = 0.6, n_flowers = 5, n_parameters = 2, constraints = const)
+result, cost, hist = FPA.optimize(25)
+result[cost.argmin()]
 print('fim')
