@@ -15,6 +15,7 @@ class FPA():
 
         # Random Initial Flowers
         self.init_flowers()
+
         # Get the best flower from initial population
         self.best = self.flowers[self.cost.argmin()]
 
@@ -24,6 +25,7 @@ class FPA():
     def calcularDist(self,vet):
         dim_vet = len(vet)
         n_var = 3
+        savaDist = []
         #Ponto Optico Wireless Inicial==>
         x_opw_A = 0
         y_opw_A = 0
@@ -47,11 +49,16 @@ class FPA():
                 x_next = vet[i + n_var]
                 y_next = vet[i + 1 + n_var]
                 z_next = vet[i + 2 + n_var]
+
+                savaDist.append(np.sqrt(np.power((x - x_opw_A), 2) + np.power((y - y_opw_A), 2)))
+                savaDist.append(np.sqrt(np.power((x - x_opw_A), 2) + np.power((y - y_opw_A), 2)))
+
                 dist = np.sqrt(np.power((x - x_opw_A), 2) + np.power((y - y_opw_A), 2)) +\
-                       np.sqrt(np.power((x - x_next), 2) + np.power((y - y_next), 2))
+                       np.sqrt(np.power((x - x_opw_A), 2) + np.power((y - y_opw_A), 2))
                 print("Primero link", dist)
             elif i==(dim_vet-n_var):
                 dist = np.sqrt(np.power((x - x_opw_B), 2) + np.power((y - y_opw_B), 2))
+                savaDist.append(dist)
                 print("Ultimos links-->", dist)
             else:
                 x_next = vet[i + n_var]
@@ -59,8 +66,9 @@ class FPA():
                 z_next = vet[i + 2 + n_var]
                 dist = np.sqrt(np.power((x - x_next), 2) + np.power((y - y_next), 2))
                 print("links do meio-->",dist)
+                savaDist.append(dist)
             totDist = totDist + dist
-        return totDist
+        return totDist,savaDist
 
     def function_obj(self,x):
         qtd_var = 3 # X, Y, Z
@@ -73,13 +81,13 @@ class FPA():
         qtd_obstaculos = self.calcularObstaculos(x)
 
         #calcular a distancia euclidiana entre o ultimo UAV e o ponto optico_wireless
-        dist_optWirelessToUAV = self.calcularDist(x)
+        dist_optWirelessToUAV,saveDist = self.calcularDist(x)
 
-        if dist_optWirelessToUAV>(linkMax * qtd_links):
+        if dist_optWirelessToUAV> (linkMax * qtd_links):
             out = 10000000
         else:
             out = (dist_optWirelessToUAV/ (linkMax * qtd_links) ) + qtd_obstaculos
-
+            print()
         return out
 
     def global_pollination(self,x): #Global Pollination
@@ -102,8 +110,6 @@ class FPA():
 
         # Save history for plotting
         history = np.zeros((max_gen, 30))
-
-
         # Generation loop
         for i in range(max_gen):
 
