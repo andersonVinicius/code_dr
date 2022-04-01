@@ -1,13 +1,13 @@
 #criar cenario
 from matplotlib import pyplot as plt
-from FPA_UAV import FPA
+# from FPA_UAV import FPA
 import numpy as np
 import random
 import math
 #=====================================================>
 # Two dimensional rotation
 # returns coordinates in a tuple (x,y)
-class Cenario:
+class Cenario():
     def rotate(self,x, y, r):
         rx = (x*math.cos(r)) - (y*math.sin(r))
         ry = (y*math.cos(r)) + (x*math.sin(r))
@@ -115,10 +115,10 @@ class Cenario:
 # plt.show()
 
 #teste
-c = Cenario()
-flowers = c.create()
-const = [np.array([-2.5, 2.5]), np.array([-1.5, 1.5])]
-FPA = FPA(switch_probability = 0.6, n_flowers = 5, n_parameters = 2, constraints = const)
-result, cost, hist = FPA.optimize(25)
-result[cost.argmin()]
-print('fim')
+# c = Cenario()
+# flowers = c.create()
+# const = [np.array([-2.5, 2.5]), np.array([-1.5, 1.5])]
+# FPA = FPA(switch_probability = 0.6, n_flowers = 5, n_parameters = 2, constraints = const)
+# result, cost, hist = FPA.optimize(25)
+# result[cost.argmin()]
+# print('fim')
