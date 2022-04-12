@@ -53,7 +53,7 @@ class Cenario():
     def create(self):
             #quantidades de UAVs
             ND_max = 10 #numero de UAVs
-            pop = 100 #populacao
+            pop = 1000 #populacao
             n_variaveis = 3
             quantPositions = (ND_max*n_variaveis)
             matrix_UAVs = np.zeros((pop,quantPositions)) #matrix de processamento
@@ -75,11 +75,11 @@ class Cenario():
             for i in range(pop):
                 ND = 10
                 # matrix_UAVs[i, 0] = ND  #atribua o quantidade de UAVs
-                range_sort = 100
+                range_sort = 1000
                 origem_x = posOPtoWire_A_x
                 origem_y = posOPtoWire_A_y
 
-                for j in range(0,(ND)*n_variaveis,3):
+                for j in range(0,(ND) * n_variaveis,3):
 
                     coord = self.point_ring((origem_x, origem_y), range_sort, enlace)
                     x=[]
@@ -92,9 +92,49 @@ class Cenario():
                             y.append(tuple[1])
 
                     # Dentre as possiblidade, escolha um
-                    eleito = np.random.randint(len(x))
-                    proximo_x =  x[eleito]
-                    proximo_y =  y[eleito]
+                    # eleito = np.random.randint(len(x))
+                    # proximo_x =  x[eleito]
+                    # proximo_y =  y[eleito]
+                    #===================================>
+                    # verificar quantos UAVs anteriores vao
+                    # esta na sombra do proximo.
+                    #===================================>
+
+                    key = True
+
+                    cont2=0
+                    while key:
+                        cont = 0
+                        quant_points = 0
+
+                        #Dentre as possiblidade, escolha um
+                        eleito = np.random.randint(len(x))
+                        proximo_x = x[eleito]
+                        proximo_y = y[eleito]
+
+                        for z in range(0,j,3):
+
+                            dist = np.sqrt(np.power((proximo_x - matrix_UAVs[i,z]), 2) +
+                                           np.power((proximo_y - matrix_UAVs[i,z+1]), 2))
+
+                            if dist <= enlace:
+                                cont+=1
+                        # print(cont)
+                        if cont<=2:
+                            key = False
+                        if cont2>=5000:
+                            break
+
+                        cont2+=1
+
+
+
+
+
+
+
+
+                    #=============================================
                     matrix_UAVs[i,j] = proximo_x # escolha o x
                     matrix_UAVs[i, j+1] = proximo_y # escolha o y
                     matrix_UAVs[i, j+2] = 50 # escolha o z
@@ -102,6 +142,8 @@ class Cenario():
                     # Atribua o proximo ponto a origem
                     origem_x = proximo_x
                     origem_y = proximo_y
+
+
             return matrix_UAVs
 
 

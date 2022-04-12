@@ -8,7 +8,7 @@ class FPA():
         self.sp = switch_probability
         self.n_flowers = n_flowers
         self.flowers = []
-        self.cost = np.zeros(100)
+        self.cost = np.zeros(1000)
         self.random = np.random
         self.n_parameters = n_parameters
         self.const = constraints
@@ -26,6 +26,7 @@ class FPA():
         dim_vet = len(vet)
         n_var = 3
         savaDist = []
+
         #Ponto Optico Wireless Inicial==>
         x_opw_A = 0
         y_opw_A = 0
@@ -42,19 +43,18 @@ class FPA():
             x = vet[i]
             y = vet[i + 1]
             z = vet[i + 2]
-
-
             if i == 0:
 
                 x_next = vet[i + n_var]
                 y_next = vet[i + 1 + n_var]
                 z_next = vet[i + 2 + n_var]
+                partA = np.sqrt(np.power((x - x_opw_A), 2) + np.power((y - y_opw_A), 2))
+                partB = np.sqrt(np.power((x - x_opw_A), 2) + np.power((y - y_opw_A), 2))
 
-                savaDist.append(np.sqrt(np.power((x - x_opw_A), 2) + np.power((y - y_opw_A), 2)))
-                savaDist.append(np.sqrt(np.power((x - x_opw_A), 2) + np.power((y - y_opw_A), 2)))
+                savaDist.append(partA)
+                savaDist.append(partB)
 
-                dist = np.sqrt(np.power((x - x_opw_A), 2) + np.power((y - y_opw_A), 2)) +\
-                       np.sqrt(np.power((x - x_opw_A), 2) + np.power((y - y_opw_A), 2))
+                dist = partA + partB
                 print("Primero link", dist)
             elif i==(dim_vet-n_var):
                 dist = np.sqrt(np.power((x - x_opw_B), 2) + np.power((y - y_opw_B), 2))
@@ -74,6 +74,7 @@ class FPA():
         qtd_var = 3 # X, Y, Z
         n_uavs = len(x)/qtd_var
         qtd_links = n_uavs+1
+        out = 0
 
         linkMax = 300 #metros
 
@@ -86,8 +87,13 @@ class FPA():
         if dist_optWirelessToUAV> (linkMax * qtd_links):
             out = 10000000
         else:
-            out = (dist_optWirelessToUAV/ (linkMax * qtd_links) ) + qtd_obstaculos
-            print()
+            for item in saveDist:
+                if (item>linkMax):
+                    out = 10000000
+                    break
+                else:
+                    out += (item/linkMax)
+
         return out
 
     def global_pollination(self,x): #Global Pollination
@@ -110,6 +116,7 @@ class FPA():
 
         # Save history for plotting
         history = np.zeros((max_gen, 30))
+
         # Generation loop
         for i in range(max_gen):
 

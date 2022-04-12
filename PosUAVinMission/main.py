@@ -63,9 +63,19 @@ from FPA_UAV import FPA
 # plt.show()
 
 
-c = Cenario()
-flowers = c.create()
+# c = Cenario()
+# flowers = c.create()
 const = [np.array([-2.5, 2.5]), np.array([-1.5, 1.5])]
-FPA = FPA(switch_probability = 0.6, n_flowers = 5, n_parameters = 2, constraints = const)
-result, cost, hist = FPA.optimize(25)
-result[cost.argmin()]
+FPA = FPA(switch_probability = 0.6,
+          n_flowers = 5,
+          n_parameters = 2,
+          constraints = const)
+result, cost, hist = FPA.optimize(2500)
+matrix_UAVs=result[cost.argmin()]
+
+for j in range(0,30,3):
+        print(j)
+        plt.plot(matrix_UAVs[j], matrix_UAVs[j+1],marker='*')
+
+plt.plot(matrix_UAVs[range(0,30,3)],matrix_UAVs[range(1,30,3)], linestyle = 'dotted')
+plt.show()
