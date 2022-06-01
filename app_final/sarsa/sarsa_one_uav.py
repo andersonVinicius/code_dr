@@ -331,16 +331,3 @@ for n_segm in range(5, 20):
                                     writer = csv.DictWriter(csvfile, fieldnames=info)
                                     writer.writeheader()
                                     writer.writerows(all_sts)
-
-                                # np.savetxt("../dataSarsa/sarsa_estatistica_ml.csv", all_sts, delimiter=";")
-                                # print(f'simpleQl Fail: {fail_ql_sample} Path:{path_ql_sample}\n'
-                                #       f'Sarsa Fail: {fail_sarsa} Path: {path_sarsa}')
-
-
-
-# #save Sarsa otimizado --------------->
-# np.savetxt("dataSarsa/pontoDePartidaUavWindSpeedSarsa.csv", pontoDePartidaUavWindSpeed, delimiter=";")
-# np.savetxt("dataSarsa/pontoDePartidaUavNewDistaceSarsa.csv", pontoDePartidaUavNewDistace, delimiter=";")
-# np.savetxt("dataSarsa/consumerEnergyUavForMissionQLeSarsa.csv", consumerEnergyUavForMissionQLe, delimiter=";")
-#
-

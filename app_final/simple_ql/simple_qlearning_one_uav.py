@@ -261,68 +261,73 @@ pontoDePartidaUavNewDistace = np.zeros((len(linksDesastre), 50))
 pontoDePartidaUavNewDistaceNaive = np.zeros((len(linksDesastre), 50))
 
 n_segm = 10
-num_episodes = 3000
-learning_rate = 0.9
-discount_rate = 0.5
+num_episodes = [100, 200, 300, 400, 500, 1000, 1500, 2000, 2500, 3000]
+conj_learning_rate = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+conj_discount_rate = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 allPaths = []
 # allPaths.append(zeroPaths)
 # =====================================================================
 # quant_uavs_service = len(pontoDePartidaUavDistance[0, :])
 quant_uavs_service = 1
 quant_links_broke = len(pontoDePartidaUavDistance[0:1, 0])
+all_sts = []
+# all_sts.append(['n_segmentos', 'num_episodes', 'learning_rate', 'discount_rate','sarsa fail'])
 
 for n_segm in range(5, 20):
-    for i in range(quant_links_broke):
-        print('Destino:', i + 1)
-        for j in range(quant_uavs_service):
-            print('Link Optico _>', '[' + str(i + 1) + '] ', 'UAV mission -> [' + str(j + 1) + '] ')
-            s = pontoDePartidaUavDistance[i, j] * 1000  # convert km to m
-            if s >= 0:
-                segm = int(np.ceil(s / (vUav * n_segm)))
-                percentAumentoDist = []
-                segmVdsolo = []
-                sumPath = 0
-                d = 0
-                dNaive = 0
-                for z in range(segm):
-                    # criar instancia do Objeto Sarsa
-                    seed = i + j + z
-                    ql = QL(np,n_segm,seed,num_episodes,learning_rate,discount_rate)
-                    # criar ambiente a ser explorado
-                    # ql.creatEnv(i + j + z)
+    for n_ep in num_episodes:
+        for learning_rate in conj_learning_rate:
+            for discount_rate in conj_discount_rate:
+                for i in range(quant_links_broke):
+                    print('Destino:', i + 1)
+                    for j in range(quant_uavs_service):
+                        print('Link Optico _>', '[' + str(i + 1) + '] ', 'UAV mission -> [' + str(j + 1) + '] ')
+                        s = pontoDePartidaUavDistance[i, j] * 1000  # convert km to m
+                        if s >= 0:
+                            segm = int(np.ceil(s / (vUav * n_segm)))
+                            percentAumentoDist = []
+                            segmVdsolo = []
+                            sumPath = 0
+                            d = 0
+                            dNaive = 0
+                            for z in range(segm):
+                                # criar instancia do Objeto Sarsa
+                                seed = i + j + z
+                                ql = QL(np, n_segm, seed, n_ep, learning_rate, discount_rate)
+                                # criar ambiente a ser explorado
+                                # ql.creatEnv(i + j + z)
 
-                    # chamar o metodo responsavel pelo Sarsa
-                    sarsa_q_table, sarsa_list_epsForsteps, \
-                    sarsa_rewards_all_episodes, sarsa_deltas = ql.start_sarsa()
+                                # # chamar o metodo responsavel pelo Sarsa
+                                # sarsa_q_table, sarsa_list_epsForsteps, \
+                                # sarsa_rewards_all_episodes, sarsa_deltas = ql.start_sarsa()
+                                #
+                                # # retorne o caminho e a falha ao encontrar uma rota valida
+                                # path_sarsa, fail_sarsa = ql.findPath(sarsa_q_table, ql.init_space, ql.state_obj)
 
-                    # retorne o caminho e a falha ao encontrar uma rota valida
-                    path_sarsa, fail_sarsa = ql.findPath(sarsa_q_table, ql.init_space, ql.state_obj)
+                                # chamar o metodo responsavel pelo ql_simple
+                                simple_ql_q_table, sarsa_list_epsForsteps, \
+                                sarsa_rewards_all_episodes, sarsa_deltas = ql.start_simpleQL()
 
-                    # chamar o metodo responsavel pelo ql_simple
-                    simple_ql_q_table, sarsa_list_epsForsteps, \
-                    sarsa_rewards_all_episodes, sarsa_deltas = ql.start_simpleQL()
+                                path_ql_sample, fail_ql_sample = ql.findPath(simple_ql_q_table, ql.init_space, ql.state_obj)
+                                #
+                                # chamar o metodo responsavel pelo egreedy
+                                # egreedy_q_table, egreedy_list_epsForsteps, \
+                                # egreedy_rewards_all_episodes, egreedy_deltas = ql.start_egreed()
+                                #
+                                # # retorne o caminho e a falha ao encontrar uma rota valida
+                                # path_egreedy, fail_egreedy = ql.findPath(egreedy_q_table, ql.init_space, ql.state_obj)
+                                # n_segmentos | num_episodes | learning_rate | discount_rate | egreedy fail | sarsa fail | simple q-learning fail|
+                                vet_estatistica = [n_segm, num_episodes, learning_rate, discount_rate, fail_ql_sample]
+                                info = ['n_segmentos','num_episodes', 'learning_rate', 'discount_rate', 'fail']
+                                dict_row = {
+                                    'n_segmentos': n_segm,
+                                    'num_episodes': n_ep,
+                                    'learning_rate': learning_rate,
+                                    'discount_rate': discount_rate,
+                                    'fail': fail_ql_sample
+                                }
 
-                    path_ql_sample, fail_ql_sample = ql.findPath(simple_ql_q_table, ql.init_space, ql.state_obj)
-
-                    # chamar o metodo responsavel pelo Sarsa
-                    egreedy_q_table, egreedy_list_epsForsteps, \
-                    egreedy_rewards_all_episodes, egreedy_deltas = ql.start_egreed()
-
-                    # retorne o caminho e a falha ao encontrar uma rota valida
-                    path_egreedy, fail_egreedy = ql.findPath(egreedy_q_table, ql.init_space, ql.state_obj)
-                    # n_segmentos | num_episodes | learning_rate | discount_rate | egreedy fail | sarsa fail | simple q-learning fail|
-                    vet_estatistica = [n_segm, num_episodes, learning_rate, discount_rate, fail_egreedy, fail_sarsa, fail_ql_sample]
-
-                    np.savetxt("../dataS/estatistica_ml.csv", vet_estatistica,
-                               delimiter=";")
-                    # print(f'simpleQl Fail: {fail_ql_sample} Path:{path_ql_sample}\n'
-                    #       f'Sarsa Fail: {fail_sarsa} Path: {path_sarsa}')
-
-
-
-# #save Sarsa otimizado --------------->
-# np.savetxt("dataSarsa/pontoDePartidaUavWindSpeedSarsa.csv", pontoDePartidaUavWindSpeed, delimiter=";")
-# np.savetxt("dataSarsa/pontoDePartidaUavNewDistaceSarsa.csv", pontoDePartidaUavNewDistace, delimiter=";")
-# np.savetxt("dataSarsa/consumerEnergyUavForMissionQLeSarsa.csv", consumerEnergyUavForMissionQLe, delimiter=";")
-#
-
+                                all_sts.append(dict_row)
+                                with open('../dataSQLsimple/egreedy_estatistica_ml.csv', 'w') as csvfile:
+                                    writer = csv.DictWriter(csvfile, fieldnames=info)
+                                    writer.writeheader()
+                                    writer.writerows(all_sts)
