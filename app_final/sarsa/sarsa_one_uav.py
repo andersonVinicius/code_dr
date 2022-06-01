@@ -3,10 +3,12 @@ import numpy as np
 import csv
 import networkx as nx
 from geographiclib.geodesic import Geodesic
-from QL import QL
+from app_final.QL import QL
 
 
 # from scipy.spatial import distance as distAPI
+
+
 
 def calTime(va, payload, battery, np):
     Cd = 0.54  # drag coefficient
@@ -70,7 +72,7 @@ def positionUav(lat1, long1, lat2, long2, distEnlace, tecAcessMax):
 
 
 # variaveis da topologia ================================================================================================
-file = 'stockholm.txt'
+file = '../stockholm.txt'
 name = 'stockholm'
 graph = nx.DiGraph(name=name)  # DiGraph because we have two fibers (one each way) between any pair of nodes
 nNodes = 0
@@ -173,7 +175,7 @@ for i in range(33):
     menorDistanciaBaseFixa.append(result[0][0])
 
 # ===========================================================================
-desastre = 'desastres.csv'
+desastre = '../desastres.csv'
 listDes = []
 
 with open(desastre, 'r') as f:
@@ -258,80 +260,83 @@ pontoDePartidaUavWindSpeedNaive = np.zeros((len(linksDesastre), 50))
 pontoDePartidaUavNewDistace = np.zeros((len(linksDesastre), 50))
 pontoDePartidaUavNewDistaceNaive = np.zeros((len(linksDesastre), 50))
 
-n_segm=10
-num_episodes = 3000
-learning_rate = 0.9
-discount_rate = 0.5
+n_segm = 10
+num_episodes = [100, 200, 300, 400, 500, 1000, 1500, 2000, 2500, 3000]
+conj_learning_rate = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+conj_discount_rate = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 allPaths = []
 # allPaths.append(zeroPaths)
 # =====================================================================
+# quant_uavs_service = len(pontoDePartidaUavDistance[0, :])
+quant_uavs_service = 1
+quant_links_broke = len(pontoDePartidaUavDistance[0:1, 0])
+all_sts = []
+# all_sts.append(['n_segmentos', 'num_episodes', 'learning_rate', 'discount_rate','sarsa fail'])
 
-for i in range(len(pontoDePartidaUavDistance[0:1, 0])):
-    print('Destino:', i + 1)
-    for j in range(len(pontoDePartidaUavDistance[0, :])):
-        print('Link Optico _>', '[' + str(i + 1) + '] ', 'UAV mission -> [' + str(j + 1) + '] ')
-        s = pontoDePartidaUavDistance[i, j] * 1000  # convert km to m
-        if s >= 0:
-            segm = int(np.ceil(s / (vUav * n_segm)))
-            percentAumentoDist = []
-            segmVdsolo = []
-            sumPath = 0
-            d = 0
-            dNaive = 0
-            for z in range(segm):
-                # criar instancia do Objeto Sarsa
-                seed = i + j + z
-                ql = QL(np,n_segm,seed,num_episodes,learning_rate,discount_rate)
-                # criar ambiente a ser explorado
-                # ql.creatEnv(i + j + z)
+for n_segm in range(5, 20):
+    for n_ep in num_episodes:
+        for learning_rate in conj_learning_rate:
+            for discount_rate in conj_discount_rate:
+                for i in range(quant_links_broke):
+                    print('Destino:', i + 1)
+                    for j in range(quant_uavs_service):
+                        print('Link Optico _>', '[' + str(i + 1) + '] ', 'UAV mission -> [' + str(j + 1) + '] ')
+                        s = pontoDePartidaUavDistance[i, j] * 1000  # convert km to m
+                        if s >= 0:
+                            segm = int(np.ceil(s / (vUav * n_segm)))
+                            percentAumentoDist = []
+                            segmVdsolo = []
+                            sumPath = 0
+                            d = 0
+                            dNaive = 0
+                            for z in range(segm):
+                                # criar instancia do Objeto Sarsa
+                                seed = i + j + z
+                                ql = QL(np, n_segm, seed, n_ep, learning_rate, discount_rate)
+                                # criar ambiente a ser explorado
+                                # ql.creatEnv(i + j + z)
 
-                # chamar o metodo responsavel pelo Sarsa
-                egreedy_q_table, egreedy_list_epsForsteps, \
-                egreedy_rewards_all_episodes, egreedy_deltas = ql.start_sarsa()
+                                # chamar o metodo responsavel pelo Sarsa
+                                sarsa_q_table, sarsa_list_epsForsteps, \
+                                sarsa_rewards_all_episodes, sarsa_deltas = ql.start_sarsa()
 
-                # retorne o caminho e a falha ao encontrar uma rota valida
-                path, fail = ql.findPath(egreedy_q_table, ql.init_space, ql.state_obj)
+                                # retorne o caminho e a falha ao encontrar uma rota valida
+                                path_sarsa, fail_sarsa = ql.findPath(sarsa_q_table, ql.init_space, ql.state_obj)
 
-                # if fail == True:
-                #     # leitura do caminho naive
-                #     limit = 10
-                #     pathNaive.append(limit)
-                #     while limit != 390:
-                #         nextMov = ql.env[limit].actions['up']
-                #         pathNaive.append(nextMov)
-                #         limit = nextMov
-                # else:
-                #     print()
+                                # # chamar o metodo responsavel pelo ql_simple
+                                # simple_ql_q_table, sarsa_list_epsForsteps, \
+                                # sarsa_rewards_all_episodes, sarsa_deltas = ql.start_simpleQL()
+                                #
+                                # path_ql_sample, fail_ql_sample = ql.findPath(simple_ql_q_table, ql.init_space, ql.state_obj)
+                                #
+                                # # chamar o metodo responsavel pelo Sarsa
+                                # egreedy_q_table, egreedy_list_epsForsteps, \
+                                # egreedy_rewards_all_episodes, egreedy_deltas = ql.start_egreed()
+                                #
+                                # # retorne o caminho e a falha ao encontrar uma rota valida
+                                # path_egreedy, fail_egreedy = ql.findPath(egreedy_q_table, ql.init_space, ql.state_obj)
+                                # n_segmentos | num_episodes | learning_rate | discount_rate | egreedy fail | sarsa fail | simple q-learning fail|
+                                vet_estatistica = [n_segm, num_episodes, learning_rate, discount_rate, fail_sarsa]
+                                info = ['n_segmentos','num_episodes', 'learning_rate', 'discount_rate', 'fail']
+                                dict_row = {
+                                    'n_segmentos': n_segm,
+                                    'num_episodes': n_ep,
+                                    'learning_rate': learning_rate,
+                                    'discount_rate': discount_rate,
+                                    'fail': fail_sarsa
+                                }
+
+                                all_sts.append(dict_row)
+                                with open('../dataSarsa/sarsa_estatistica_ml.csv', 'w') as csvfile:
+                                    writer = csv.DictWriter(csvfile, fieldnames=info)
+                                    writer.writeheader()
+                                    writer.writerows(all_sts)
+
+                                # np.savetxt("../dataSarsa/sarsa_estatistica_ml.csv", all_sts, delimiter=";")
+                                # print(f'simpleQl Fail: {fail_ql_sample} Path:{path_ql_sample}\n'
+                                #       f'Sarsa Fail: {fail_sarsa} Path: {path_sarsa}')
 
 
-                print(path, "sts fail:", fail)
-                zeroPaths = np.zeros(50)
-                zeroPaths[0:len(path)] = path
-                allPaths.append(zeroPaths)
-                np.savetxt("dataSarsa/uav_percursoOnGrid.csv", allPaths.astype(int), delimiter=";")
-
-                wind = []  # init vetor do velocidade do vento
-                dsolo = []  # init vetor da altura do UAV em relacao ao solo
-
-                # leia e armazene os dados da altura e da velocidade do vento (Otimizado)
-                for p in path:
-                    wind.append(ql.env[p].windSpeed)
-                    dsolo.append(ql.env[p].altura)
-
-                #Otimizado------------>
-                for k in range(len(path) - 1):
-                    # se a transicao de um estado para outro tiverem alturas diferentes
-                    if abs(dsolo[k] - dsolo[k + 1]) != 0:
-                        # calcule a distancia euclidiana quando UAV troca de estado
-                        d += math.sqrt((vUav ** 2) + ((abs(dsolo[k] - dsolo[k + 1])) ** 2))
-                    else:
-                        d += vUav  # o quanto o UAV desloca por segundo
-            #Otimizado-------->
-            pontoDePartidaUavWindSpeed[i, j] = np.mean(wind)
-            pontoDePartidaUavNewDistace[i, j] = d
-            # vp = vUav + pontoDePartidaUavWindSpeed[i, j]
-            vp = vUav
-            consumerEnergyUavForMissionQLe[i, j] = energyCons2(payload, g, d, vUav, vp) / 1000
 
 # #save Sarsa otimizado --------------->
 # np.savetxt("dataSarsa/pontoDePartidaUavWindSpeedSarsa.csv", pontoDePartidaUavWindSpeed, delimiter=";")

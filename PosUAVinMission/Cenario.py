@@ -8,6 +8,8 @@ import math
 # Two dimensional rotation
 # returns coordinates in a tuple (x,y)
 class Cenario():
+    def __init__(self,n_uavs):
+        self.n_uavs = n_uavs
     def rotate(self,x, y, r):
         rx = (x*math.cos(r)) - (y*math.sin(r))
         ry = (y*math.cos(r)) + (x*math.sin(r))
@@ -52,10 +54,9 @@ class Cenario():
     #         id = id + 1
     def create(self):
             #quantidades de UAVs
-            ND_max = 10 #numero de UAVs
-            pop = 1000 #populacao
+            pop = 5000 #populacao
             n_variaveis = 3
-            quantPositions = (ND_max*n_variaveis)
+            quantPositions = (self.n_uavs * n_variaveis)
             matrix_UAVs = np.zeros((pop,quantPositions)) #matrix de processamento
             dim_x = 1000 #dimensao eixo x
             dim_y = 1000 #dimensao eixo y
@@ -73,13 +74,13 @@ class Cenario():
 
             enlace = 300 #m
             for i in range(pop):
-                ND = 10
+
                 # matrix_UAVs[i, 0] = ND  #atribua o quantidade de UAVs
                 range_sort = 1000
                 origem_x = posOPtoWire_A_x
                 origem_y = posOPtoWire_A_y
 
-                for j in range(0,(ND) * n_variaveis,3):
+                for j in range(0,self.n_uavs * n_variaveis,3):
 
                     coord = self.point_ring((origem_x, origem_y), range_sort, enlace)
                     x=[]
@@ -126,13 +127,6 @@ class Cenario():
                             break
 
                         cont2+=1
-
-
-
-
-
-
-
 
                     #=============================================
                     matrix_UAVs[i,j] = proximo_x # escolha o x

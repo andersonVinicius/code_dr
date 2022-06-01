@@ -1,74 +1,90 @@
 
 
-from Grid_space2 import Grid_space2
+from app_final.Grid_space2 import Grid_space2
 import operator
-from RL_2 import Egreedy, SimpleQL, Sarsa
+from app_final.RL_2 import Egreedy, SimpleQL, Sarsa
 import numpy as np
 
 class QL:
     # reward
-    r = [-1, 1, 100]  # yes wind - no_wind - no_windBest
+     # yes wind - no_wind - TheBestPos
+    # env = []
 
-    num_episodes = 500
-    learning_rate = 0.9
-    discount_rate = 0.5
+    # num_episodes = 1000
+    # learning_rate = 0.9
+    # discount_rate = 0.5
     # create tab Q
-    q_table = {}
-    vetWind = [6.4, 6.74, 7.02, 7.27, 7.49, 7.69, 7.86, 8.02, 8.17, 8.31, 12.32]
-    distanceSolo = [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150]
+
     # vetWind = [6.4, 6.74, 7.02, 7.27, 7.49, 7.69]
     # distanceSolo = [50, 60, 70, 80, 90, 100]
 
     # number of grids or states
     # environmente dimensions
-    xdim = 20  # dimensao eixo x
-    ydim = 20  # dimensao eixo y
-    zdim = 1  # dimensao eixo z
+    # xdim = 5  # dimensao eixo x
+    # ydim = 5  # dimensao eixo y
+    # zdim = 1  # dimensao eixo z
 
-    N_blocks = (xdim * ydim * zdim)
-    # start state
-    init_space = int(xdim / 2)
-    state_obj = int((xdim * ydim) - (xdim / 2))
-    limitStoped = 500
-    all_blocks = np.arange(N_blocks)
-    n_sta = N_blocks
-    env = []
-    Egreedy = Egreedy
-    Sarsa = Sarsa
-    SimpleQL =  SimpleQL
-    Grid_space2 =Grid_space2
-    np = np
-    exploration_rate = learning_rate
-    max_exploration_rate = learning_rate
-    min_exploration_rate = 0.01
-    exploration_decay_rate = 0.01
+    # N_blocks = (xdim * ydim * zdim)
+    # # start state
+    # init_space = int(xdim / 2)
+    # state_obj = int((xdim * ydim) - (xdim / 2))
+    # limitStoped = 1000
+    # all_blocks = np.arange(N_blocks)
+    # n_sta = N_blocks
+
+
+    # Egreedy = Egreedy
+    # Sarsa = Sarsa
+    # SimpleQL =  SimpleQL
+    # Grid_space2 =Grid_space2
+    # np = np
+    # exploration_rate = learning_rate
+    # max_exploration_rate = learning_rate
+    # min_exploration_rate = 0.01
+    # exploration_decay_rate = 0.01
+
+    # QLEgreedymatrixSteToEP = np.zeros(shape=(seed, num_episodes + 1), dtype=int)
+    # QLSimplematrixSteToEP = np.zeros(shape=(seed, num_episodes + 1), dtype=int)
+    # SarsamatrixSteToEP = np.zeros(shape=(seed, num_episodes + 1), dtype=int)
+    #
+    # QLEgreedymatrixRWDToEP = np.zeros(shape=(seed, num_episodes + 1), dtype=int)
+    # QLSimplematrixRWDToEP = np.zeros(shape=(seed, num_episodes + 1), dtype=int)
+    # SarsamatrixRWDToEP = np.zeros(shape=(seed, num_episodes + 1), dtype=int)
+    #
+    # QLEgreedymatrixDeltaToEP = np.zeros(shape=(seed, num_episodes + 1), dtype=int)
+    # QLSimplematrixDeltaToEP = np.zeros(shape=(seed, num_episodes + 1), dtype=int)
+    # SarsamatrixDeltaToEP = np.zeros(shape=(seed, num_episodes + 1), dtype=int)
 
     # read = np.genfromtxt("/home/anderson/Dropbox/posGraduacao/doutorado/qualis_paper/dataS/seedDisponibles.csv",
     #                      delimiter=";").astype(int)
-    seed = 1
-    QLEgreedymatrixSteToEP = np.zeros(shape=(seed, num_episodes + 1), dtype=int)
-    QLSimplematrixSteToEP = np.zeros(shape=(seed, num_episodes + 1), dtype=int)
-    SarsamatrixSteToEP = np.zeros(shape=(seed, num_episodes + 1), dtype=int)
 
-    QLEgreedymatrixRWDToEP = np.zeros(shape=(seed, num_episodes + 1), dtype=int)
-    QLSimplematrixRWDToEP = np.zeros(shape=(seed, num_episodes + 1), dtype=int)
-    SarsamatrixRWDToEP = np.zeros(shape=(seed, num_episodes + 1), dtype=int)
+    def __init__(self, np, segm, seed, num_episodes, learning_rate, discount_rate):
+        self.num_episodes = num_episodes
+        self.learning_rate = learning_rate
+        self.discount_rate = discount_rate
+        self.np = np
+        self.xdim = segm
+        self.ydim = segm
+        self.init_space = int(self.xdim / 2)
+        self.state_obj = int((self.xdim * self.ydim) - (self.xdim / 2))
 
-    QLEgreedymatrixDeltaToEP = np.zeros(shape=(seed, num_episodes + 1), dtype=int)
-    QLSimplematrixDeltaToEP = np.zeros(shape=(seed, num_episodes + 1), dtype=int)
-    SarsamatrixDeltaToEP = np.zeros(shape=(seed, num_episodes + 1), dtype=int)
+        self.zdim = 1
+        self.r = [-1, 1, 100]
+        self.env = []
+        self.q_table = {}
+        self.vetWind = [6.4, 6.74, 7.02, 7.27, 7.49, 7.69, 7.86, 8.02, 8.17, 8.31, 12.32]
+        self.distanceSolo = [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150]
 
-    def __init__(self,np,segm,seed,num_episodes,learning_rate,discount_rate):
-         self.num_episodes = num_episodes
-         self.learning_rate = learning_rate
-         self.discount_rate = discount_rate
+        self.N_blocks = (self.xdim * self.ydim * self.zdim)
+        # start state
+        self.init_space = int(self.xdim / 2)
+        self.state_obj = int((self.xdim * self.ydim) - (self.xdim / 2))
+        self.limitStoped = 1000
+        self.all_blocks = np.arange(self.N_blocks)
+        self.n_sta = self.N_blocks
 
-         self.np = np
-         self.xdim = segm
-         self.ydim = segm
-         self.init_space = int(self.xdim / 2)
-         self.state_obj = int((self.xdim * self.ydim) - (self.xdim / 2))
-         self.creatEnv(seed)
+        self.creatEnv(seed)
+
 
     # =====================================================================
     # Find Neighborhood===================================================
@@ -159,7 +175,7 @@ class QL:
         # ======================================================================================
         # print('Iniciou o Q-Learning e-greedy')
 
-        q_egr = self.Egreedy(self.num_episodes,
+        q_egr = Egreedy(self.num_episodes,
                         self.learning_rate,
                         self.discount_rate,
                         self.init_space,
@@ -182,16 +198,16 @@ class QL:
         egreedy_rewards_all_episodes, egreedy_deltas
 
     def start_sarsa(self):
-        sarsa = self.Sarsa(self.num_episodes,
-                             self.learning_rate,
-                             self.discount_rate,
-                             self.init_space,
-                             self.q_table,
-                             self.env,
-                             self.r,
-                             self.np,
-                             self.limitStoped,
-                             self.state_obj)
+        sarsa = Sarsa(self.num_episodes,
+                      self.learning_rate,
+                      self.discount_rate,
+                      self.init_space,
+                      self.q_table,
+                      self.env,
+                      self.r,
+                      self.np,
+                      self.limitStoped,
+                      self.state_obj)
 
         ss_q_table, ss_list_epsForsteps, \
         ss_rewards_all_episodes, ss_deltas = sarsa.start()
@@ -200,7 +216,7 @@ class QL:
         return ss_q_table, ss_list_epsForsteps, \
                ss_rewards_all_episodes, ss_deltas
     def start_simpleQL(self):
-        q_simple = self.SimpleQL(self.num_episodes,
+        q_simple = SimpleQL(self.num_episodes,
                            self.learning_rate,
                            self.discount_rate,
                            self.init_space,

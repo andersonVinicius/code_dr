@@ -72,7 +72,7 @@ def positionUav(lat1,long1,lat2,long2,distEnlace,tecAcessMax):
         A=C
     return saveCoorUAV
 
-file='../../../../tccDaFernanda/stockholm.txt'
+file='stockholm.txt'
 name ='stockholm'
 # # initializing the graph object and computing the k_shortest_path
 # topology = read_txt_file(topology_name + '.txt', topology_name)

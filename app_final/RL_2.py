@@ -2,42 +2,42 @@ import operator
 class Egreedy:
 
     # variables
-    num_episodes = 1000
-    learning_rate = 0.9
-    discount_rate = 0.1
-    q_table = {}
-    init_space = 0
-    r = []
-    env={}
-    np=0
-    limitStoped = 0
-    exploration_rate = 1
-    max_exploration_rate = 1
-    min_exploration_rate = 0.01
-    exploration_decay_rate = 0.01
-    state_obj = 0
+    # num_episodes = 1000
+    # learning_rate = 0.9
+    # discount_rate = 0.1
+    # q_table = {}
+    # init_space = 0
+    # r = []
+    # env={}
+    # np=0
+    # limitStoped = 0
+    # exploration_rate = 1
+    # max_exploration_rate = 1
+    # min_exploration_rate = 0.01
+    # exploration_decay_rate = 0.01
+    # state_obj = 0
 
     # construtor UAV
-    def __init__(self, num_episodes,learning_rate,
-                 discount_rate,init_space,q_table,
-                 env,r,np,exploration_rate,max_exploration_rate,
-                 min_exploration_rate,exploration_decay_rate,limitStoped,state_obj):
+    def __init__(self, num_episodes, learning_rate,
+                 discount_rate, init_space, q_table,
+                 env, r, np, exploration_rate, max_exploration_rate,
+                 min_exploration_rate, exploration_decay_rate, limitStoped, state_obj):
 
-                  self.exploration_rate = exploration_rate
-                  self.max_exploration_rate = max_exploration_rate
-                  self.min_exploration_rate = min_exploration_rate
-                  self.exploration_decay_rate = exploration_decay_rate
+            self.exploration_rate = exploration_rate
+            self.max_exploration_rate = max_exploration_rate
+            self.min_exploration_rate = min_exploration_rate
+            self.exploration_decay_rate = exploration_decay_rate
 
-                  self.num_episodes = num_episodes
-                  self.learning_rate = learning_rate
-                  self.discount_rate = discount_rate
-                  self.init_space = init_space
-                  self.q_table = q_table
-                  self.r = r
-                  self.env = env
-                  self.np = np
-                  self.limitStoped = limitStoped
-                  self.state_obj = state_obj
+            self.num_episodes = num_episodes
+            self.learning_rate = learning_rate
+            self.discount_rate = discount_rate
+            self.init_space = init_space
+            self.q_table = q_table
+            self.r = r
+            self.env = env
+            self.np = np
+            self.limitStoped = limitStoped
+            self.state_obj = state_obj
 
 
     def start(self):
@@ -128,7 +128,6 @@ class Egreedy:
                                    self.np.exp(-self.exploration_decay_rate * i)
             i += 1
         return self.q_table, list_epsForsteps,rewards_all_episodes, deltas
-
 
 class SimpleQL:
     # variables
@@ -231,19 +230,20 @@ class SimpleQL:
 
             i += 1
         return self.q_table, list_epsForsteps,rewards_all_episodes, deltas
+
 class Sarsa:
 # variables
-    num_episodes = 1000
-    learning_rate = 0.9
-    discount_rate = 0.1
-    q_table = {}
-    init_space = 0
-    r = []
-    env = {}
-    np = 0
-    limitStoped = 0
-    exploration_rate = 1
-    state_obj=0
+#     num_episodes = 1000
+#     learning_rate = 0.9
+#     discount_rate = 0.5
+#     q_table = {}
+#     init_space = 0
+#     r = []
+#     env = {}
+#     np = 0
+#     limitStoped = 0
+#     exploration_rate = 1
+#     state_obj=0
     # construtor UAV
     def __init__(self, num_episodes, learning_rate,
                  discount_rate, init_space, q_table,
@@ -267,8 +267,6 @@ class Sarsa:
         list_epsForsteps = []
         rewards_all_episodes = []
         deltas = []
-        min_step = 99999999
-        quantTime = 0
         i = 0
         while i <= self.num_episodes:
             state = self.init_space  # init

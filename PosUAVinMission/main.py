@@ -66,16 +66,30 @@ from FPA_UAV import FPA
 # c = Cenario()
 # flowers = c.create()
 const = [np.array([-2.5, 2.5]), np.array([-1.5, 1.5])]
+n_uavs = 8
 FPA = FPA(switch_probability = 0.6,
           n_flowers = 5,
           n_parameters = 2,
-          constraints = const)
+          constraints = const,
+          n_uavs = n_uavs)
 result, cost, hist = FPA.optimize(2500)
 matrix_UAVs=result[cost.argmin()]
 
-for j in range(0,30,3):
+
+#optc_wireless terrestre ======================>
+plt.plot(0, 0, marker='x')
+plt.plot(1000, 1000, marker='x')
+#==============================================>
+
+#UAVS==========================================>
+for j in range(0,n_uavs*3,3):
         print(j)
         plt.plot(matrix_UAVs[j], matrix_UAVs[j+1],marker='*')
+#==============================================
 
-plt.plot(matrix_UAVs[range(0,30,3)],matrix_UAVs[range(1,30,3)], linestyle = 'dotted')
+#enlace de comunicacao ----------------------------------------------->
+plt.plot([0, matrix_UAVs[0]],[0,matrix_UAVs[1]], linestyle = 'solid')
+plt.plot([ matrix_UAVs[(n_uavs*3)-3],1000],[matrix_UAVs[(n_uavs*3)-2],1000], linestyle = 'solid')
+plt.plot(matrix_UAVs[range(0,n_uavs*3,3)],matrix_UAVs[range(1,n_uavs*3,3)], linestyle = 'dotted')
+plt.grid(True)
 plt.show()

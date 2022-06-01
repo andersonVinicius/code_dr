@@ -3,15 +3,17 @@ import random
 from scipy.stats import levy
 from Cenario import Cenario
 class FPA():
-    def __init__(self, switch_probability=0.8, n_flowers=50, n_parameters=2, constraints=None):
+    def __init__(self, switch_probability=0.8, n_flowers=50, n_parameters=2, constraints=None, n_uavs=2):
         # Initialization of variables
         self.sp = switch_probability
         self.n_flowers = n_flowers
         self.flowers = []
-        self.cost = np.zeros(1000)
+        self.cost = np.zeros(5000)
         self.random = np.random
         self.n_parameters = n_parameters
         self.const = constraints
+        self.n_uavs = n_uavs
+        self.var = 3
 
         # Random Initial Flowers
         self.init_flowers()
@@ -19,8 +21,67 @@ class FPA():
         # Get the best flower from initial population
         self.best = self.flowers[self.cost.argmin()]
 
-    def calcularObstaculos(self,x):
-        return np.random.randint(20)
+    def get_line(self,x1, y1, x2, y2):
+        points = []
+        issteep = abs(y2 - y1) > abs(x2 - x1)
+        if issteep:
+            x1, y1 = y1, x1
+            x2, y2 = y2, x2
+        rev = False
+        if x1 > x2:
+            x1, x2 = x2, x1
+            y1, y2 = y2, y1
+            rev = True
+        deltax = x2 - x1
+        deltay = abs(y2 - y1)
+        error = int(deltax / 2)
+        y = y1
+        ystep = None
+        if y1 < y2:
+            ystep = 1
+        else:
+            ystep = -1
+        for x in range(int(x1), int(x2) + 1):
+            if issteep:
+                points.append((y, x))
+            else:
+                points.append((x, y))
+            error -= deltay
+            if error < 0:
+                y += ystep
+                error += deltax
+        # Reverse the list if the coordinates were reversed
+        if rev:
+            points.reverse()
+        return points
+
+    def calcularObstaculos(self,vet):
+        n_var = 3
+        out =0
+        # for i in range(0,len(vet),n_var):
+        #
+        #     get_line(vet[i], vet[i+1], x2, y2)
+        #     if (vet[i]>=400 and vet[i]<=600 and vet[i+1]>=400 and vet[i+1]<=600):
+        #         out = 10000000
+        #         break
+        # return out
+
+        for i in range(0, len(vet), n_var):
+            x = vet[i]
+            y = vet[i + 1]
+            z = vet[i + 2]
+            if i == 0:
+                pass
+            elif i == (len(vet) - n_var):
+                pass
+            else:
+                x_next = vet[i + n_var]
+                y_next = vet[i + 1 + n_var]
+                z_next = vet[i + 2 + n_var]
+                points = self.get_line(x, y, x_next, y_next)
+                # dist = np.sqrt(np.power((x - x_next), 2) + np.power((y - y_next), 2))
+                print(points)
+
 
     def calcularDist(self,vet):
         dim_vet = len(vet)
@@ -89,10 +150,10 @@ class FPA():
         else:
             for item in saveDist:
                 if (item>linkMax):
-                    out = 10000000
+                    out = 10000000 +  qtd_obstaculos
                     break
                 else:
-                    out += (item/linkMax)
+                    out += (item/linkMax) + qtd_obstaculos
 
         return out
 
@@ -104,7 +165,7 @@ class FPA():
         x_new = x + self.random.randn() * (x1-x2)
         return x_new
     def init_flowers(self):
-        c = Cenario()
+        c = Cenario(self.n_uavs)
         self.flowers = c.create()
         i=0
         for flw in self.flowers:
@@ -115,7 +176,7 @@ class FPA():
     def optimize(self,max_gen=1000):
 
         # Save history for plotting
-        history = np.zeros((max_gen, 30))
+        history = np.zeros((max_gen, self.var * self.n_uavs))
 
         # Generation loop
         for i in range(max_gen):
