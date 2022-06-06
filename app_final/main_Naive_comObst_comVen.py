@@ -4,7 +4,7 @@ import csv
 import networkx as nx
 from geographiclib.geodesic import Geodesic
 from QL import QL
-
+from matplotlib import pyplot as plt
 
 # from scipy.spatial import distance as distAPI
 
@@ -283,13 +283,13 @@ pontoDePartidaUavWindSpeedNaive = np.zeros((len(linksDesastre), 50))
 
 pontoDePartidaUavNewDistace = np.zeros((len(linksDesastre), 50))
 pontoDePartidaUavNewDistaceNaive = np.zeros((len(linksDesastre), 50))
-n_segm=20
+n_segm=15
 meanConsumerQLe = []
 meanTimeOperationQLe = []
 
 num_episodes = 500
 learning_rate = 0.9
-discount_rate = 0.5
+discount_rate = 0.2
 
 allPaths = []
 # allPaths.append(zeroPaths)
@@ -317,7 +317,8 @@ for i in range(len(pontoDePartidaUavDistance[0:1, 0])):
 
                 # retorne o caminho e a falha ao encontrar uma rota valida
                 path, fail = ql.findPath(egreedy_q_table, ql.init_space, ql.state_obj)
-
+                plt.plot(egreedy_list_epsForsteps)
+                plt.show()
                 print(path, "sts fail:", fail)
                 zeroPaths = np.zeros(50)
                 zeroPaths[0:len(path)] = path
@@ -334,40 +335,40 @@ for i in range(len(pontoDePartidaUavDistance[0:1, 0])):
                 pathNaive = []
 
                 #leitura do caminho naive
-                limit = 10
-                pathNaive.append(limit)
-                while limit != 390:
-                    nextMov = ql.env[limit].actions['up']
-                    pathNaive.append(nextMov)
-                    limit = nextMov
-
-                # leia e armazene os dados da altura e da velocidade do vento (Otimizado)
-                for p in path:
-                    wind.append(ql.env[p].windSpeed)
-                    dsolo.append(ql.env[p].altura)
-
-                # leia e armazene os dados da altura e da velocidade do vento (NAIVE)
-                for p in pathNaive:
-                    windNaive.append(ql.env[p].windSpeed)
-                    dsoloNaive.append(ql.env[p].altura)
-
-                #Otimizado------------>
-                for k in range(len(path) - 1):
-                    # se a transicao de um estado para outro tiverem alturas diferentes
-                    if abs(dsolo[k] - dsolo[k + 1]) != 0:
-                        # calcule a distancia euclidiana quando UAV troca de estado
-                        d += math.sqrt((vUav ** 2) + ((abs(dsolo[k] - dsolo[k + 1])) ** 2))
-                    else:
-                        d += vUav  # o quanto o UAV desloca por segundo
-
-                #Naive ---------------->
-                for k in range(len(pathNaive) - 1):
-                    # se a transicao de um estado para outro tiverem alturas diferentes
-                    if abs(dsoloNaive[k] - dsoloNaive[k + 1]) != 0:
-                        # calcule a distancia euclidiana quando UAV troca de estado
-                        dNaive += math.sqrt((vUav ** 2) + ((abs(dsoloNaive[k] - dsoloNaive[k + 1])) ** 2))
-                    else:
-                        dNaive += vUav  # o quanto o UAV desloca por segundo
+                # limit = 10
+                # pathNaive.append(limit)
+                # while limit != 390:
+                #     nextMov = ql.env[limit].actions['up']
+                #     pathNaive.append(nextMov)
+                #     limit = nextMov
+                #
+                # # leia e armazene os dados da altura e da velocidade do vento (Otimizado)
+                # for p in path:
+                #     wind.append(ql.env[p].windSpeed)
+                #     dsolo.append(ql.env[p].altura)
+                #
+                # # leia e armazene os dados da altura e da velocidade do vento (NAIVE)
+                # for p in pathNaive:
+                #     windNaive.append(ql.env[p].windSpeed)
+                #     dsoloNaive.append(ql.env[p].altura)
+                #
+                # #Otimizado------------>
+                # for k in range(len(path) - 1):
+                #     # se a transicao de um estado para outro tiverem alturas diferentes
+                #     if abs(dsolo[k] - dsolo[k + 1]) != 0:
+                #         # calcule a distancia euclidiana quando UAV troca de estado
+                #         d += math.sqrt((vUav ** 2) + ((abs(dsolo[k] - dsolo[k + 1])) ** 2))
+                #     else:
+                #         d += vUav  # o quanto o UAV desloca por segundo
+                #
+                # #Naive ---------------->
+                # for k in range(len(pathNaive) - 1):
+                #     # se a transicao de um estado para outro tiverem alturas diferentes
+                #     if abs(dsoloNaive[k] - dsoloNaive[k + 1]) != 0:
+                #         # calcule a distancia euclidiana quando UAV troca de estado
+                #         dNaive += math.sqrt((vUav ** 2) + ((abs(dsoloNaive[k] - dsoloNaive[k + 1])) ** 2))
+                #     else:
+                #         dNaive += vUav  # o quanto o UAV desloca por segundo
 
                 # guardar todas as quantidade de path por segmento
                 # sumPath += (len(path)-1)

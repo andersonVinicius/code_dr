@@ -69,7 +69,7 @@ class QL:
         self.state_obj = int((self.xdim * self.ydim) - (self.xdim / 2))
 
         self.zdim = 1
-        self.r = [-1, 1, 100]
+        self.r = [-1, 1, 200]
         self.env = []
         self.q_table = {}
         self.vetWind = [6.4, 6.74, 7.02, 7.27, 7.49, 7.69, 7.86, 8.02, 8.17, 8.31, 12.32]
@@ -82,6 +82,11 @@ class QL:
         self.limitStoped = 1000
         self.all_blocks = np.arange(self.N_blocks)
         self.n_sta = self.N_blocks
+
+        self.exploration_rate = learning_rate
+        self.max_exploration_rate = learning_rate
+        self.min_exploration_rate = 0.01
+        self.exploration_decay_rate = 0.01
 
         self.creatEnv(seed)
 
@@ -117,6 +122,12 @@ class QL:
             # "back":back
         }
         return actions
+
+    def prob_obstaculos(self, id_rand):
+        if 0.8 > self.np.random.uniform(0, 1):
+            return self.vetWind[10] - self.vetWind[id_rand]
+        else:
+            return -100
 
     def creatEnv(self, seed):
         count = 0

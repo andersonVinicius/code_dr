@@ -261,7 +261,7 @@ pontoDePartidaUavNewDistace = np.zeros((len(linksDesastre), 50))
 pontoDePartidaUavNewDistaceNaive = np.zeros((len(linksDesastre), 50))
 
 n_segm = 10
-num_episodes = [100, 200, 300, 400, 500, 1000, 1500, 2000, 2500, 3000]
+num_episodes = [100, 200, 300, 400, 500]
 conj_learning_rate = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 conj_discount_rate = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 allPaths = []
@@ -273,7 +273,7 @@ quant_links_broke = len(pontoDePartidaUavDistance[0:1, 0])
 all_sts = []
 # all_sts.append(['n_segmentos', 'num_episodes', 'learning_rate', 'discount_rate','sarsa fail'])
 
-for n_segm in range(5, 20):
+for n_segm in range(15, 16):
     for n_ep in num_episodes:
         for learning_rate in conj_learning_rate:
             for discount_rate in conj_discount_rate:

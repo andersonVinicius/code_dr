@@ -11,10 +11,10 @@ class Egreedy:
     # env={}
     # np=0
     # limitStoped = 0
-    # exploration_rate = 1
-    # max_exploration_rate = 1
-    # min_exploration_rate = 0.01
-    # exploration_decay_rate = 0.01
+    exploration_rate = 1
+    max_exploration_rate = 1
+    min_exploration_rate = 0.01
+    exploration_decay_rate = 0.01
     # state_obj = 0
 
     # construtor UAV
@@ -46,6 +46,7 @@ class Egreedy:
         list_epsForsteps = []
         rewards_all_episodes = []
         deltas = []
+        min_step = 0
         i = 0
         while i <= self.num_episodes:
             state = self.init_space  # init
@@ -55,6 +56,7 @@ class Egreedy:
             # print("Episodio --- ", i)
             # ...Step to episodes
             biggest_change = 0
+
 
             while True:
                 # Exploration-exploitation trade-off
@@ -103,7 +105,7 @@ class Egreedy:
                 rewards_current_episode += rwd
 
                 #if (self.env[state].r == self.r[2] or self.env[state].r == self.r[0] ) :
-                if (state == self.state_obj):
+                if (state == self.state_obj ):
 
                     # if (min_step <= n_steps):
                     #     n_steps = min_step
@@ -127,7 +129,7 @@ class Egreedy:
                                    (self.max_exploration_rate - self.min_exploration_rate) * \
                                    self.np.exp(-self.exploration_decay_rate * i)
             i += 1
-        return self.q_table, list_epsForsteps,rewards_all_episodes, deltas
+        return self.q_table, list_epsForsteps, rewards_all_episodes, deltas
 
 class SimpleQL:
     # variables

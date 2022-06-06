@@ -260,20 +260,20 @@ pontoDePartidaUavWindSpeedNaive = np.zeros((len(linksDesastre), 50))
 pontoDePartidaUavNewDistace = np.zeros((len(linksDesastre), 50))
 pontoDePartidaUavNewDistaceNaive = np.zeros((len(linksDesastre), 50))
 
-n_segm = 10
-num_episodes = [100, 200, 300, 400, 500, 1000, 1500, 2000, 2500, 3000]
-conj_learning_rate = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
-conj_discount_rate = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+n_segms = [50]
+num_episodes = [200]
+conj_learning_rate = [0.9]
+conj_discount_rate = [0.3]
 allPaths = []
 # allPaths.append(zeroPaths)
 # =====================================================================
-# quant_uavs_service = len(pontoDePartidaUavDistance[0, :])
-quant_uavs_service = 1
+quant_uavs_service = len(pontoDePartidaUavDistance[0, :])
+# quant_uavs_service = 1
 quant_links_broke = len(pontoDePartidaUavDistance[0:1, 0])
 all_sts = []
 # all_sts.append(['n_segmentos', 'num_episodes', 'learning_rate', 'discount_rate','sarsa fail'])
 
-for n_segm in range(5, 20):
+for n_segm in n_segms:
     for n_ep in num_episodes:
         for learning_rate in conj_learning_rate:
             for discount_rate in conj_discount_rate:
@@ -317,8 +317,9 @@ for n_segm in range(5, 20):
                                 # path_egreedy, fail_egreedy = ql.findPath(egreedy_q_table, ql.init_space, ql.state_obj)
                                 # n_segmentos | num_episodes | learning_rate | discount_rate | egreedy fail | sarsa fail | simple q-learning fail|
                                 vet_estatistica = [n_segm, num_episodes, learning_rate, discount_rate, fail_ql_sample]
-                                info = ['n_segmentos','num_episodes', 'learning_rate', 'discount_rate', 'fail']
+                                info = ['id_uav','n_segmentos','num_episodes', 'learning_rate', 'discount_rate', 'fail']
                                 dict_row = {
+                                    'id_uav': j,
                                     'n_segmentos': n_segm,
                                     'num_episodes': n_ep,
                                     'learning_rate': learning_rate,
@@ -327,7 +328,7 @@ for n_segm in range(5, 20):
                                 }
 
                                 all_sts.append(dict_row)
-                                with open('../dataSQLsimple/egreedy_estatistica_ml.csv', 'w') as csvfile:
+                                with open('../data_simple_ql/'+str(n_segm)+'_x_'+str(n_segm)+'_'+str(n_ep)+'_'+str(learning_rate)+'_'+str(discount_rate)+'_simple_ql_estatistica_ml.csv', 'w') as csvfile:
                                     writer = csv.DictWriter(csvfile, fieldnames=info)
                                     writer.writeheader()
                                     writer.writerows(all_sts)

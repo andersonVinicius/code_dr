@@ -261,7 +261,7 @@ pontoDePartidaUavNewDistace = np.zeros((len(linksDesastre), 50))
 pontoDePartidaUavNewDistaceNaive = np.zeros((len(linksDesastre), 50))
 
 n_segm = 10
-num_episodes = [100, 200, 300, 400, 500, 1000, 1500, 2000, 2500, 3000]
+num_episodes = [100, 200, 300, 400, 500]
 conj_learning_rate = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 conj_discount_rate = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 allPaths = []
@@ -273,14 +273,14 @@ quant_links_broke = len(pontoDePartidaUavDistance[0:1, 0])
 all_sts = []
 # all_sts.append(['n_segmentos', 'num_episodes', 'learning_rate', 'discount_rate','sarsa fail'])
 
-for n_segm in range(5, 20):
+for n_segm in range(15, 16):
     for n_ep in num_episodes:
         for learning_rate in conj_learning_rate:
             for discount_rate in conj_discount_rate:
                 for i in range(quant_links_broke):
                     print('Destino:', i + 1)
                     for j in range(quant_uavs_service):
-                        print('Link Optico _>', '[' + str(i + 1) + '] ', 'UAV mission -> [' + str(j + 1) + '] ')
+                        # print('Link Optico _>', '[' + str(i + 1) + '] ', 'UAV mission -> [' + str(j + 1) + '] ')
                         s = pontoDePartidaUavDistance[i, j] * 1000  # convert km to m
                         if s >= 0:
                             segm = int(np.ceil(s / (vUav * n_segm)))
@@ -290,6 +290,7 @@ for n_segm in range(5, 20):
                             d = 0
                             dNaive = 0
                             for z in range(segm):
+                                print(f'segmento: {z}')
                                 # criar instancia do Objeto Sarsa
                                 seed = i + j + z
                                 ql = QL(np, n_segm, seed, n_ep, learning_rate, discount_rate)
@@ -327,7 +328,7 @@ for n_segm in range(5, 20):
                                 }
 
                                 all_sts.append(dict_row)
-                                with open('../dataSarsa/sarsa_estatistica_ml.csv', 'w') as csvfile:
+                                with open('../data_sarsa/sarsa_estatistica_ml.csv', 'w') as csvfile:
                                     writer = csv.DictWriter(csvfile, fieldnames=info)
                                     writer.writeheader()
                                     writer.writerows(all_sts)
