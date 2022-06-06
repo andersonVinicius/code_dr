@@ -3,7 +3,7 @@ import numpy as np
 import csv
 import networkx as nx
 from geographiclib.geodesic import Geodesic
-from QL import QL
+from app_final.QL import QL
 
 
 # from scipy.spatial import distance as distAPI
@@ -281,7 +281,7 @@ for i in range(len(pontoDePartidaUavDistance[0:1, 0])):
             for z in range(segm):
                 # criar instancia do Objeto Sarsa
                 seed = i + j + z
-                ql = QL(np,n_segm,seed,num_episodes,learning_rate,discount_rate)
+                ql = QL(np, n_segm, seed, num_episodes, learning_rate, discount_rate)
                 # criar ambiente a ser explorado
                 # ql.creatEnv(i + j + z)
 
@@ -304,7 +304,6 @@ for i in range(len(pontoDePartidaUavDistance[0:1, 0])):
 
                     print("NEW PATH:", path)
 
-
                 zeroPaths = np.zeros(50)
                 zeroPaths[0:len(path)] = path
                 allPaths.append(zeroPaths)
@@ -318,7 +317,7 @@ for i in range(len(pontoDePartidaUavDistance[0:1, 0])):
                     wind.append(ql.env[p].windSpeed)
                     dsolo.append(ql.env[p].altura)
 
-                #Otimizado------------>
+                # Otimizado------------>
                 for k in range(len(path) - 1):
                     # se a transicao de um estado para outro tiverem alturas diferentes
                     if abs(dsolo[k] - dsolo[k + 1]) != 0:
@@ -326,7 +325,7 @@ for i in range(len(pontoDePartidaUavDistance[0:1, 0])):
                         d += math.sqrt((vUav ** 2) + ((abs(dsolo[k] - dsolo[k + 1])) ** 2))
                     else:
                         d += vUav  # o quanto o UAV desloca por segundo
-            #Otimizado-------->
+            # Otimizado-------->
             pontoDePartidaUavWindSpeed[i, j] = np.mean(wind)
             pontoDePartidaUavNewDistace[i, j] = d
             # vp = vUav + pontoDePartidaUavWindSpeed[i, j]

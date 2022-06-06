@@ -3,7 +3,7 @@ import numpy as np
 import csv
 import networkx as nx
 from geographiclib.geodesic import Geodesic
-from QL import QL
+from app_final.QL import QL
 
 
 # from scipy.spatial import distance as distAPI
@@ -259,9 +259,9 @@ pontoDePartidaUavNewDistace = np.zeros((len(linksDesastre), 50))
 pontoDePartidaUavNewDistaceNaive = np.zeros((len(linksDesastre), 50))
 
 n_segm = 20
-num_episodes = 2500
-learning_rate = 0.8
-discount_rate = 0.1
+num_episodes = 200
+learning_rate = 0.9
+discount_rate = 0.3
 allPaths = []
 # allPaths.append(zeroPaths)
 # =====================================================================
@@ -281,13 +281,13 @@ for i in range(len(pontoDePartidaUavDistance[0:1, 0])):
             for z in range(segm):
                 # criar instancia do Objeto Sarsa
                 seed = i + j + z
-                ql = QL(np,n_segm,seed,num_episodes,learning_rate,discount_rate)
+                ql = QL(np, n_segm, seed, num_episodes, learning_rate, discount_rate)
                 # criar ambiente a ser explorado
                 # ql.creatEnv(i + j + z)
 
                 # chamar o metodo responsavel pelo Sarsa
                 egreedy_q_table, egreedy_list_epsForsteps, \
-                egreedy_rewards_all_episodes, egreedy_deltas = ql.start_sarsa()
+                egreedy_rewards_all_episodes, egreedy_deltas = ql.start_simpleQL()
 
                 # retorne o caminho e a falha ao encontrar uma rota valida
                 path, fail = ql.findPath(egreedy_q_table, ql.init_space, ql.state_obj)
@@ -304,7 +304,6 @@ for i in range(len(pontoDePartidaUavDistance[0:1, 0])):
 
                     print("NEW PATH:", path)
 
-
                 zeroPaths = np.zeros(50)
                 zeroPaths[0:len(path)] = path
                 allPaths.append(zeroPaths)
@@ -318,7 +317,7 @@ for i in range(len(pontoDePartidaUavDistance[0:1, 0])):
                     wind.append(ql.env[p].windSpeed)
                     dsolo.append(ql.env[p].altura)
 
-                #Otimizado------------>
+                # Otimizado------------>
                 for k in range(len(path) - 1):
                     # se a transicao de um estado para outro tiverem alturas diferentes
                     if abs(dsolo[k] - dsolo[k + 1]) != 0:
@@ -326,7 +325,7 @@ for i in range(len(pontoDePartidaUavDistance[0:1, 0])):
                         d += math.sqrt((vUav ** 2) + ((abs(dsolo[k] - dsolo[k + 1])) ** 2))
                     else:
                         d += vUav  # o quanto o UAV desloca por segundo
-            #Otimizado-------->
+            # Otimizado-------->
             pontoDePartidaUavWindSpeed[i, j] = np.mean(wind)
             pontoDePartidaUavNewDistace[i, j] = d
             # vp = vUav + pontoDePartidaUavWindSpeed[i, j]
@@ -334,8 +333,8 @@ for i in range(len(pontoDePartidaUavDistance[0:1, 0])):
             consumerEnergyUavForMissionQLe[i, j] = energyCons2(payload, g, d, vUav, vp) / 1000
 
 # #save Sarsa otimizado --------------->
-np.savetxt("../data_sarsa/pontoDePartidaUavWindSpeedSarsa.csv", pontoDePartidaUavWindSpeed, delimiter=";")
-np.savetxt("../data_sarsa/pontoDePartidaUavNewDistaceSarsa.csv", pontoDePartidaUavNewDistace, delimiter=";")
-np.savetxt("../data_sarsa/consumerEnergyUavForMissionQLeSarsa.csv", consumerEnergyUavForMissionQLe, delimiter=";")
+np.savetxt("../data_simple_ql/pontoDePartidaUavWindSpeedSarsa.csv", pontoDePartidaUavWindSpeed, delimiter=";")
+np.savetxt("../data_simple_ql/pontoDePartidaUavNewDistaceSarsa.csv", pontoDePartidaUavNewDistace, delimiter=";")
+np.savetxt("../data_simple_ql/consumerEnergyUavForMissionQLeSarsa.csv", consumerEnergyUavForMissionQLe, delimiter=";")
 #
 
