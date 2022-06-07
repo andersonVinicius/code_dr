@@ -70,7 +70,7 @@ def positionUav(lat1, long1, lat2, long2, distEnlace, tecAcessMax):
 
 
 # variaveis da topologia ================================================================================================
-file = 'stockholm.txt'
+file = '../stockholm.txt'
 name = 'stockholm'
 graph = nx.DiGraph(name=name)  # DiGraph because we have two fibers (one each way) between any pair of nodes
 nNodes = 0
@@ -173,7 +173,7 @@ for i in range(33):
     menorDistanciaBaseFixa.append(result[0][0])
 
 # ===========================================================================
-desastre = 'desastres.csv'
+desastre = '../desastres.csv'
 listDes = []
 
 with open(desastre, 'r') as f:
@@ -283,11 +283,11 @@ pontoDePartidaUavWindSpeedNaive = np.zeros((len(linksDesastre), 50))
 
 pontoDePartidaUavNewDistace = np.zeros((len(linksDesastre), 50))
 pontoDePartidaUavNewDistaceNaive = np.zeros((len(linksDesastre), 50))
-n_segm=15
+n_segm = 5
 meanConsumerQLe = []
 meanTimeOperationQLe = []
 
-num_episodes = 500
+num_episodes = 200
 learning_rate = 0.9
 discount_rate = 0.2
 
@@ -317,13 +317,13 @@ for i in range(len(pontoDePartidaUavDistance[0:1, 0])):
 
                 # retorne o caminho e a falha ao encontrar uma rota valida
                 path, fail = ql.findPath(egreedy_q_table, ql.init_space, ql.state_obj)
-                plt.plot(egreedy_list_epsForsteps)
-                plt.show()
+                # plt.plot(egreedy_list_epsForsteps)
+                # plt.show()
                 print(path, "sts fail:", fail)
                 zeroPaths = np.zeros(50)
                 zeroPaths[0:len(path)] = path
                 allPaths.append(zeroPaths)
-                np.savetxt("dataS/uav_percursoOnGrid.csv", allPaths, delimiter=";")
+                # np.savetxt("dataS/uav_percursoOnGrid.csv", allPaths, delimiter=";")
 
                 wind = []  # init vetor do velocidade do vento
                 dsolo = []  # init vetor da altura do UAV em relacao ao solo
@@ -394,25 +394,25 @@ for i in range(len(pontoDePartidaUavDistance[0:1, 0])):
 
 
 # #save otimizado --------------->
-# np.savetxt("../data_egreedy/pontoDePartidaUavWindSpeed.csv", pontoDePartidaUavWindSpeed, delimiter=";")
-# np.savetxt("../data_egreedy/pontoDePartidaUavNewDistace.csv", pontoDePartidaUavNewDistace, delimiter=";")
-# np.savetxt("../data_egreedy/consumerEnergyUavForMissionQLe.csv", consumerEnergyUavForMissionQLe, delimiter=";")
+np.savetxt("../data_egreedy/"+str(n_segm)+"_x_"+str(n_segm)+"_pontoDePartidaUavWindSpeed.csv", pontoDePartidaUavWindSpeed, delimiter=";")
+np.savetxt("../data_egreedy/"+str(n_segm)+"_x_"+str(n_segm)+"_pontoDePartidaUavNewDistace.csv", pontoDePartidaUavNewDistace, delimiter=";")
+np.savetxt("../data_egreedy/"+str(n_segm)+"_x_"+str(n_segm)+"_consumerEnergyUavForMissionQLe.csv", consumerEnergyUavForMissionQLe, delimiter=";")
+
+#save Naive ------------------->
+np.savetxt("../data_naive/pontoDePartidaUavWindSpeedNaive.csv", pontoDePartidaUavWindSpeedNaive, delimiter=";")
+np.savetxt("../data_naive/pontoDePartidaUavNewDistaceNaive.csv", pontoDePartidaUavNewDistaceNaive, delimiter=";")
+np.savetxt("../data_naive/consumerEnergyUavForMissionQLeNaive.csv", consumerEnergyUavForMissionQLeNaive, delimiter=";")
+
+
+# #save otimizado Sem Vento --------------->
+# np.savetxt("../data_egreedy/"+str(n_segm)+"_x_"+str(n_segm)+"pontoDePartidaUavWindSpeedSemVento.csv", pontoDePartidaUavWindSpeed, delimiter=";")
+# np.savetxt("../data_egreedy/"+str(n_segm)+"_x_"+str(n_segm)+"pontoDePartidaUavNewDistaceSemVento.csv", pontoDePartidaUavNewDistace, delimiter=";")
+# np.savetxt("../data_egreedy/"+str(n_segm)+"_x_"+str(n_segm)+"consumerEnergyUavForMissionQLeSemVento.csv", consumerEnergyUavForMissionQLe, delimiter=";")
 #
-# #save Naive ------------------->
-# np.savetxt("../data_naive/pontoDePartidaUavWindSpeedNaive.csv", pontoDePartidaUavWindSpeedNaive, delimiter=";")
-# np.savetxt("../data_naive/pontoDePartidaUavNewDistaceNaive.csv", pontoDePartidaUavNewDistaceNaive, delimiter=";")
-# np.savetxt("../data_naive/consumerEnergyUavForMissionQLeNaive.csv", consumerEnergyUavForMissionQLeNaive, delimiter=";")
-
-
-#save otimizado Sem Vento --------------->
-np.savetxt("../data_egreedy/pontoDePartidaUavWindSpeedSemVento.csv", pontoDePartidaUavWindSpeed, delimiter=";")
-np.savetxt("../data_egreedy/pontoDePartidaUavNewDistaceSemVento.csv", pontoDePartidaUavNewDistace, delimiter=";")
-np.savetxt("../data_egreedy/consumerEnergyUavForMissionQLeSemVento.csv", consumerEnergyUavForMissionQLe, delimiter=";")
-
-#save Naive Sem Vento------------------->
-np.savetxt("dataS/pontoDePartidaUavWindSpeedNaiveSemVento.csv", pontoDePartidaUavWindSpeedNaive, delimiter=";")
-np.savetxt("dataS/pontoDePartidaUavNewDistaceNaiveSemVento.csv", pontoDePartidaUavNewDistaceNaive, delimiter=";")
-np.savetxt("dataS/consumerEnergyUavForMissionQLeNaiveSemVento.csv", consumerEnergyUavForMissionQLeNaive, delimiter=";")
+# #save Naive Sem Vento------------------->
+# np.savetxt("../data_naive/pontoDePartidaUavWindSpeedNaiveSemVento.csv", pontoDePartidaUavWindSpeedNaive, delimiter=";")
+# np.savetxt("../data_naive/pontoDePartidaUavNewDistaceNaiveSemVento.csv", pontoDePartidaUavNewDistaceNaive, delimiter=";")
+# np.savetxt("../data_naive/consumerEnergyUavForMissionQLeNaiveSemVento.csv", consumerEnergyUavForMissionQLeNaive, delimiter=";")
 
 # np.savetxt("dataS/pontoDePartidaUavOldDistace.csv", pontoDePartidaUavDistance, delimiter=";")
 

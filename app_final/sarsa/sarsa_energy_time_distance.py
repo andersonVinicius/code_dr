@@ -70,7 +70,7 @@ def positionUav(lat1, long1, lat2, long2, distEnlace, tecAcessMax):
 
 
 # variaveis da topologia ================================================================================================
-file = 'stockholm.txt'
+file = '../stockholm.txt'
 name = 'stockholm'
 graph = nx.DiGraph(name=name)  # DiGraph because we have two fibers (one each way) between any pair of nodes
 nNodes = 0
@@ -173,7 +173,7 @@ for i in range(33):
     menorDistanciaBaseFixa.append(result[0][0])
 
 # ===========================================================================
-desastre = 'desastres.csv'
+desastre = '../desastres.csv'
 listDes = []
 
 with open(desastre, 'r') as f:
@@ -259,7 +259,7 @@ pontoDePartidaUavNewDistace = np.zeros((len(linksDesastre), 50))
 pontoDePartidaUavNewDistaceNaive = np.zeros((len(linksDesastre), 50))
 
 n_segm = 20
-num_episodes = 2500
+num_episodes = 200
 learning_rate = 0.8
 discount_rate = 0.1
 allPaths = []
@@ -333,8 +333,8 @@ for i in range(len(pontoDePartidaUavDistance[0:1, 0])):
             consumerEnergyUavForMissionQLe[i, j] = energyCons2(payload, g, d, vUav, vp) / 1000
 
 # #save Sarsa otimizado --------------->
-np.savetxt("../data_sarsa/pontoDePartidaUavWindSpeedSarsa.csv", pontoDePartidaUavWindSpeed, delimiter=";")
-np.savetxt("../data_sarsa/pontoDePartidaUavNewDistaceSarsa.csv", pontoDePartidaUavNewDistace, delimiter=";")
-np.savetxt("../data_sarsa/consumerEnergyUavForMissionQLeSarsa.csv", consumerEnergyUavForMissionQLe, delimiter=";")
+np.savetxt("../data_sarsa/"+str(n_segm)+"_x_"+str(n_segm)+"pontoDePartidaUavWindSpeedSarsa.csv", pontoDePartidaUavWindSpeed, delimiter=";")
+np.savetxt("../data_sarsa/"+str(n_segm)+"_x_"+str(n_segm)+"pontoDePartidaUavNewDistaceSarsa.csv", pontoDePartidaUavNewDistace, delimiter=";")
+np.savetxt("../data_sarsa/"+str(n_segm)+"_x_"+str(n_segm)+"consumerEnergyUavForMissionQLeSarsa.csv", consumerEnergyUavForMissionQLe, delimiter=";")
 #
 
