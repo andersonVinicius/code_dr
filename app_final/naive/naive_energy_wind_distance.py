@@ -331,18 +331,21 @@ for n_segm in n_segms:
 
                     # leia e armazene os dados da altura e da velocidade do vento (NAIVE)
                     for p in pathNaive:
-                        windNaive.append(13.1)
+                        windNaive.append(ql.env[p].windSpeed)
                         dsoloNaive.append(ql.env[p].altura)
 
                     #Naive ---------------->
-                    for k in range(len(pathNaive) - 1):
-                        # # se a transicao de um estado para outro tiverem alturas diferentes
-                        # if abs(dsoloNaive[k] - dsoloNaive[k + 1]) != 0:
-                        #     # calcule a distancia euclidiana quando UAV troca de estado
-                        #     dNaive += math.sqrt((vUav ** 2) + ((abs(dsoloNaive[k] - dsoloNaive[k + 1])) ** 2))
-                        # else:
+                    for k in range(len(pathNaive)-1):
+                        # se a transicao de um estado para outro tiverem alturas diferentes
+                        if abs(dsoloNaive[k] - dsoloNaive[k + 1]) != 0:
+                            # calcule a distancia euclidiana quando UAV troca de estado
+                            dNaive += math.sqrt((vUav ** 2) + ((abs(dsoloNaive[k] - dsoloNaive[k + 1])) ** 2))
+                            if (k + 2) == len(pathNaive):
+                                dNaive += math.sqrt((vUav ** 2) + ((abs(dsoloNaive[k] - dsoloNaive[k + 1])) ** 2))
+                        else:
                             dNaive += vUav  # o quanto o UAV desloca por segundo
-
+                            if (k+2) == len(pathNaive):
+                                dNaive += vUav
 
                 #NAive ------->
                 pontoDePartidaUavWindSpeedNaive[i, j] = np.mean(windNaive)

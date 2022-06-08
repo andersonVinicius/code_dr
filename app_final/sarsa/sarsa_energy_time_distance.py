@@ -258,83 +258,87 @@ pontoDePartidaUavWindSpeedNaive = np.zeros((len(linksDesastre), 50))
 pontoDePartidaUavNewDistace = np.zeros((len(linksDesastre), 50))
 pontoDePartidaUavNewDistaceNaive = np.zeros((len(linksDesastre), 50))
 
-n_segm = 20
-num_episodes = 200
+n_segms = [5, 10, 15]
+num_episodes = 2500
 learning_rate = 0.8
 discount_rate = 0.1
 allPaths = []
 # allPaths.append(zeroPaths)
 # =====================================================================
+for n_segm in n_segms:
+    for i in range(len(pontoDePartidaUavDistance[0:1, 0])):
+        print('Destino:', i + 1)
+        for j in range(len(pontoDePartidaUavDistance[0, :])):
+            print('Link Optico _>', '[' + str(i + 1) + '] ', 'UAV mission -> [' + str(j + 1) + '] ')
+            s = pontoDePartidaUavDistance[i, j] * 1000  # convert km to m
+            if s >= 0:
+                segm = int(np.ceil(s / (vUav * n_segm)))
+                percentAumentoDist = []
+                segmVdsolo = []
+                sumPath = 0
+                d = 0
+                dNaive = 0
+                for z in range(segm):
+                    # criar instancia do Objeto Sarsa
+                    seed = i + j + z
+                    ql = QL(np, n_segm, seed, num_episodes, learning_rate, discount_rate)
+                    # criar ambiente a ser explorado
+                    # ql.creatEnv(i + j + z)
 
-for i in range(len(pontoDePartidaUavDistance[0:1, 0])):
-    print('Destino:', i + 1)
-    for j in range(len(pontoDePartidaUavDistance[0, :])):
-        print('Link Optico _>', '[' + str(i + 1) + '] ', 'UAV mission -> [' + str(j + 1) + '] ')
-        s = pontoDePartidaUavDistance[i, j] * 1000  # convert km to m
-        if s >= 0:
-            segm = int(np.ceil(s / (vUav * n_segm)))
-            percentAumentoDist = []
-            segmVdsolo = []
-            sumPath = 0
-            d = 0
-            dNaive = 0
-            for z in range(segm):
-                # criar instancia do Objeto Sarsa
-                seed = i + j + z
-                ql = QL(np, n_segm, seed, num_episodes, learning_rate, discount_rate)
-                # criar ambiente a ser explorado
-                # ql.creatEnv(i + j + z)
+                    # chamar o metodo responsavel pelo Sarsa
+                    egreedy_q_table, egreedy_list_epsForsteps, \
+                    egreedy_rewards_all_episodes, egreedy_deltas = ql.start_sarsa()
 
-                # chamar o metodo responsavel pelo Sarsa
-                egreedy_q_table, egreedy_list_epsForsteps, \
-                egreedy_rewards_all_episodes, egreedy_deltas = ql.start_sarsa()
+                    # retorne o caminho e a falha ao encontrar uma rota valida
+                    path, fail = ql.findPath(egreedy_q_table, ql.init_space, ql.state_obj)
+                    print(path, "sts fail:", fail)
+                    if fail == True:
+                        path = []
+                        # leitura do caminho naive
+                        limit = ql.init_space
+                        path.append(limit)
+                        while limit != ql.state_obj:
+                            nextMov = ql.env[limit].actions['up']
+                            path.append(nextMov)
+                            limit = nextMov
 
-                # retorne o caminho e a falha ao encontrar uma rota valida
-                path, fail = ql.findPath(egreedy_q_table, ql.init_space, ql.state_obj)
-                print(path, "sts fail:", fail)
-                if fail == True:
-                    path = []
-                    # leitura do caminho naive
-                    limit = ql.init_space
-                    path.append(limit)
-                    while limit != ql.state_obj:
-                        nextMov = ql.env[limit].actions['up']
-                        path.append(nextMov)
-                        limit = nextMov
+                        print("NEW PATH:", path)
 
-                    print("NEW PATH:", path)
+                    zeroPaths = np.zeros(50)
+                    zeroPaths[0:len(path)] = path
+                    allPaths.append(zeroPaths)
+                    # np.savetxt("dataSarsa/uav_percursoOnGrid.csv", allPaths.astype(int), delimiter=";")
 
-                zeroPaths = np.zeros(50)
-                zeroPaths[0:len(path)] = path
-                allPaths.append(zeroPaths)
-                # np.savetxt("dataSarsa/uav_percursoOnGrid.csv", allPaths.astype(int), delimiter=";")
+                    wind = []  # init vetor do velocidade do vento
+                    dsolo = []  # init vetor da altura do UAV em relacao ao solo
 
-                wind = []  # init vetor do velocidade do vento
-                dsolo = []  # init vetor da altura do UAV em relacao ao solo
+                    # leia e armazene os dados da altura e da velocidade do vento (Otimizado)
+                    for p in path:
+                        wind.append(ql.env[p].windSpeed)
+                        dsolo.append(ql.env[p].altura)
 
-                # leia e armazene os dados da altura e da velocidade do vento (Otimizado)
-                for p in path:
-                    wind.append(ql.env[p].windSpeed)
-                    dsolo.append(ql.env[p].altura)
+                    # Otimizado------------>
+                    for k in range(len(path) - 1):
+                        # se a transicao de um estado para outro tiverem alturas diferentes
+                        if abs(dsolo[k] - dsolo[k + 1]) != 0:
+                            # calcule a distancia euclidiana quando UAV troca de estado
+                            d += math.sqrt((vUav ** 2) + ((abs(dsolo[k] - dsolo[k + 1])) ** 2))
+                            if (k + 2) == len(path):
+                                d += math.sqrt((vUav ** 2) + ((abs(dsolo[k] - dsolo[k + 1])) ** 2))
+                        else:
+                            d += vUav  # o quanto o UAV desloca por segundo
+                            if (k + 2) == len(path):
+                                d += vUav
+                # Otimizado-------->
+                pontoDePartidaUavWindSpeed[i, j] = np.mean(wind)
+                pontoDePartidaUavNewDistace[i, j] = d
+                # vp = vUav + pontoDePartidaUavWindSpeed[i, j]
+                vp = vUav
+                consumerEnergyUavForMissionQLe[i, j] = energyCons2(payload, g, d, vUav, vp) / 1000
 
-                # Otimizado------------>
-                for k in range(len(path) - 1):
-                    # se a transicao de um estado para outro tiverem alturas diferentes
-                    if abs(dsolo[k] - dsolo[k + 1]) != 0:
-                        # calcule a distancia euclidiana quando UAV troca de estado
-                        d += math.sqrt((vUav ** 2) + ((abs(dsolo[k] - dsolo[k + 1])) ** 2))
-                    else:
-                        d += vUav  # o quanto o UAV desloca por segundo
-            # Otimizado-------->
-            pontoDePartidaUavWindSpeed[i, j] = np.mean(wind)
-            pontoDePartidaUavNewDistace[i, j] = d
-            # vp = vUav + pontoDePartidaUavWindSpeed[i, j]
-            vp = vUav
-            consumerEnergyUavForMissionQLe[i, j] = energyCons2(payload, g, d, vUav, vp) / 1000
-
-# #save Sarsa otimizado --------------->
-np.savetxt("../data_sarsa/"+str(n_segm)+"_x_"+str(n_segm)+"pontoDePartidaUavWindSpeedSarsa.csv", pontoDePartidaUavWindSpeed, delimiter=";")
-np.savetxt("../data_sarsa/"+str(n_segm)+"_x_"+str(n_segm)+"pontoDePartidaUavNewDistaceSarsa.csv", pontoDePartidaUavNewDistace, delimiter=";")
-np.savetxt("../data_sarsa/"+str(n_segm)+"_x_"+str(n_segm)+"consumerEnergyUavForMissionQLeSarsa.csv", consumerEnergyUavForMissionQLe, delimiter=";")
+    # #save Sarsa otimizado --------------->
+    np.savetxt("../data_sarsa/"+str(n_segm)+"_x_"+str(n_segm)+"pontoDePartidaUavWindSpeedSarsa.csv", pontoDePartidaUavWindSpeed, delimiter=";")
+    np.savetxt("../data_sarsa/"+str(n_segm)+"_x_"+str(n_segm)+"pontoDePartidaUavNewDistaceSarsa.csv", pontoDePartidaUavNewDistace, delimiter=";")
+    np.savetxt("../data_sarsa/"+str(n_segm)+"_x_"+str(n_segm)+"consumerEnergyUavForMissionQLeSarsa.csv", consumerEnergyUavForMissionQLe, delimiter=";")
 #
 
