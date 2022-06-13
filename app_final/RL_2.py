@@ -90,7 +90,7 @@ class Egreedy:
                 # #print(new_state)
                 # print(self.q_table[new_state].items())
                 nextStateMaxQvalue = max(self.q_table[new_state].items(), key=operator.itemgetter(1))[1]
-                rwd = self.env[new_state].r
+                rwd = self.env[new_state].r[str(state)]
                 old_qsa = self.q_table[state][str(state) + action]
 
                 # UPDATE Q ========================================================================
@@ -105,7 +105,8 @@ class Egreedy:
                 rewards_current_episode += rwd
 
                 #if (self.env[state].r == self.r[2] or self.env[state].r == self.r[0] ) :
-                if (state == self.state_obj ):
+                # if (state == self.state_obj ):
+                if (state == self.state_obj or self.env[state].obst_fixo == 1):
 
                     # if (min_step <= n_steps):
                     #     n_steps = min_step
@@ -190,19 +191,25 @@ class SimpleQL:
                 # choose random actions
                 action = actionsPossibles[self.np.random.randint(0, len(actionsPossibles))]
                 # print("random",action)
-
+                # print(' Actions possibles:', actionsPossibles)
                 new_state = self.env[state].actions[action]
-                # print('action: ',action)
+                # print('state: ', state)
+                # print('action: ', action)
                 # print('new_state: ', new_state)
                 nextStateMaxQvalue = max(self.q_table[new_state].items(), key=operator.itemgetter(1))[1]
-                rwd = self.env[new_state].r
+
+                # print(str(state))
+                # print(self.env[state].r)
+                # print(self.env[new_state].r)
+
+                rwd = self.env[new_state].r[str(state)]
                 old_qsa = self.q_table[state][str(state) + action]
 
                 # UPDATE Q ========================================================================
-                if self.env[state].r != self.r[2] or self.env[state].r != self.r[0]:
-                    q_target = rwd + self.learning_rate * nextStateMaxQvalue
-                else:
-                    q_target = rwd
+                # if self.env[state].r != self.r[2] or self.env[state].r != self.r[0]:
+                q_target = rwd + self.learning_rate * nextStateMaxQvalue
+                # else:
+                #     q_target = rwd
 
                 self.q_table[state][str(state) + action] += self.discount_rate * (q_target - self.q_table[state][str(state) + action])
                 biggest_change = max(biggest_change, self.np.abs(old_qsa - self.q_table[state][str(state) + action]))
@@ -211,7 +218,8 @@ class SimpleQL:
                 rewards_current_episode += rwd
 
                 #if (self.env[state].r == self.r[2] or self.env[state].r == self.r[0] ) :
-                if (self.env[state].r == self.r[2]):
+                if (state == self.state_obj or self.env[state].obst_fixo == 1 ):
+                # if (state == self.state_obj ):
 
                     # if (min_step <= n_steps):
                     #     n_steps = min_step
@@ -305,7 +313,7 @@ class Sarsa:
                 # print('action: ',action)
                 # print('new_state: ', new_state)
                 nextStateMaxQvalue = self.q_table[new_state][str(new_state) + action2]
-                rwd = self.env[new_state].r
+                rwd = self.env[new_state].r[str(state)]
                 old_qsa = self.q_table[state][str(state) + action]
 
                 # UPDATE Q ========================================================================
@@ -321,7 +329,8 @@ class Sarsa:
                 rewards_current_episode += rwd
 
                 #if (self.env[state].r == self.r[2] or self.env[state].r == self.r[0] ) :
-                if (state == self.state_obj):
+                # if (state == self.state_obj):
+                if (state == self.state_obj or self.env[state].obst_fixo == 1):
 
                     # if (min_step <= n_steps):
                     #     n_steps = min_step

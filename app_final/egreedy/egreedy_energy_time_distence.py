@@ -287,9 +287,9 @@ n_segms = [30]
 meanConsumerQLe = []
 meanTimeOperationQLe = []
 
-num_episodes = 200
-learning_rate = 0.9
-discount_rate = 0.2
+num_episodes = 60000
+learning_rate = 0.8
+discount_rate = 0.7
 
 allPaths = []
 # allPaths.append(zeroPaths)
@@ -317,8 +317,8 @@ for n_segm in n_segms:
 
                     # retorne o caminho e a falha ao encontrar uma rota valida
                     path, fail = ql.findPath(egreedy_q_table, ql.init_space, ql.state_obj)
-                    # plt.plot(egreedy_list_epsForsteps)
-                    # plt.show()
+                    plt.plot(egreedy_list_epsForsteps)
+                    plt.show()
 
                     zeroPaths = np.zeros(50)
                     zeroPaths[0:len(path)] = path
