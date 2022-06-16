@@ -189,14 +189,13 @@ class QL:
         if self.xdim == 10:
             obst_fixed = [12, 17, 18, 22, 27, 28, 32, 43, 45, 46, 55, 78, 88]
         if self.xdim == 30:
-            obst_fixed = [835,834,805,804,775,774,745,744,726,715,714,710,696,685,684,680,666,650,636,620,619,618,617,609,608,607,606,439,438,437,
-                          436,435,434,433,432,431,425,424,423,405,404,403,402,401,395,365,335,311,310,281,280,265,264,263,262,261,235,225,205,195,175,156,155,145,126,125,]
+            obst_fixed = [467,466,465,464,463,437,433,407,406,405,404,403]
 
 
         self.calcule_distancia_entre_obstaculos_fixos(obst_fixed)
         self.calcular_distancia_para_o_taget()
         # Event wind and obst ===============================================
-        a = 1000
+        a = 100
         b = 1
         for i in range(self.xdim * self.ydim):
             id_rand = self.np.random.randint(len(self.vetWind))

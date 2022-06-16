@@ -169,6 +169,7 @@ class SimpleQL:
         list_epsForsteps = []
         rewards_all_episodes = []
         deltas = []
+        obs_dinamico = [467,466,465,464,463,437,433,407,406,405,404,403]
         min_step = 99999999
         quantTime = 0
         i = 0
@@ -180,6 +181,7 @@ class SimpleQL:
             # print("Episodio --- ", i)
             # ...Step to episodes
             biggest_change = 0
+            mov_obs = 0
             while True:
                 # Exploration-exploitation trade-off
 
@@ -217,8 +219,13 @@ class SimpleQL:
                 n_steps = n_steps + 1
                 rewards_current_episode += rwd
 
+                if  mov_obs >= len(obs_dinamico):
+                    obs_dinamico = obs_dinamico[::-1]
+                    mov_obs = 0
+                # state == self.state_obj or self.env[state].obst_fixo == 1 or
                 #if (self.env[state].r == self.r[2] or self.env[state].r == self.r[0] ) :
                 if (state == self.state_obj or self.env[state].obst_fixo == 1 ):
+                    # print(state,' hit obstaculo movel ',obs_dinamico[mov_obs])
                 # if (state == self.state_obj ):
 
                     # if (min_step <= n_steps):
@@ -237,7 +244,7 @@ class SimpleQL:
                     deltas.append(biggest_change)
                     break
                     # key = False
-
+                mov_obs += 1
             i += 1
         return self.q_table, list_epsForsteps,rewards_all_episodes, deltas
 
