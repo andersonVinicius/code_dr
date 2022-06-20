@@ -153,7 +153,7 @@ class QL:
 
         return sum
 
-    def calcula_diferenca_entre_pos_anteria_pos_atual_para_o_target(self, a, b, actions, target, obstaculos):
+    def calcula_diferenca_entre_pos_anteria_pos_atual_para_o_target(self, a, b, c, actions, target, obstaculos, dif_wind):
         act_label = ['left', 'right',
                      'up', 'down',
                      'leftUp', 'rightUp',
@@ -163,8 +163,9 @@ class QL:
         for act in act_label:
            if actions[act] >= 0:
             # {id do grid : valor da recompensa)
-               rwd_by_act[str(actions[act])] = a * (self.env[actions[act]].dist_from_target - target) - \
-                                               b * self.somar_distancia_entre_obstaculos_fixos(obstaculos)
+               rwd_by_act[str(actions[act])] = a * (self.env[actions[act]].dist_from_target - target) \
+                                                - b * self.somar_distancia_entre_obstaculos_fixos(obstaculos)\
+                                                + c * dif_wind
 
         return rwd_by_act
 
@@ -196,8 +197,9 @@ class QL:
         self.calcule_distancia_entre_obstaculos_fixos(obst_fixed)
         self.calcular_distancia_para_o_taget()
         # Event wind and obst ===============================================
-        a = 1000
-        b = 1
+        a = 900
+        b = 10
+        c = 0
         for i in range(self.xdim * self.ydim):
             id_rand = self.np.random.randint(len(self.vetWind))
             self.env[i].obst_fixo = 0
@@ -205,9 +207,10 @@ class QL:
             self.env[i].altura = self.distanceSolo[id_rand]
             self.env[i].windSpeed = self.vetWind[id_rand]
             self.env[i].r = \
-                self.calcula_diferenca_entre_pos_anteria_pos_atual_para_o_target(a, b, self.env[i].actions,
-                                                                                       self.env[i].dist_from_target,
-                                                                                       self.env[i].dist_from_obs
+                self.calcula_diferenca_entre_pos_anteria_pos_atual_para_o_target(a, b, c, self.env[i].actions,
+                                                                                           self.env[i].dist_from_target,
+                                                                                           self.env[i].dist_from_obs,
+                                                                                           (self.vetWind[5] - self.vetWind[id_rand])
                                                                                  )
         for ob in obst_fixed:
             self.env[ob].obst_fixo = 1
