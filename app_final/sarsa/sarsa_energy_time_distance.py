@@ -4,7 +4,7 @@ import csv
 import networkx as nx
 from geographiclib.geodesic import Geodesic
 from app_final.QL import QL
-
+from matplotlib import pyplot as plt
 
 # from scipy.spatial import distance as distAPI
 
@@ -259,9 +259,9 @@ pontoDePartidaUavNewDistace = np.zeros((len(linksDesastre), 50))
 pontoDePartidaUavNewDistaceNaive = np.zeros((len(linksDesastre), 50))
 
 n_segms = [30]
-num_episodes = 60000
+num_episodes = 50000
 learning_rate = 0.9
-discount_rate = 0.7
+discount_rate = 0.3
 allPaths = []
 # allPaths.append(zeroPaths)
 # =====================================================================
@@ -303,7 +303,8 @@ for n_segm in n_segms:
                             limit = nextMov
 
                         print("NEW PATH:", path)
-
+                    plt.plot(egreedy_deltas)
+                    plt.show()
                     zeroPaths = np.zeros(50)
                     zeroPaths[0:len(path)] = path
                     allPaths.append(zeroPaths)
