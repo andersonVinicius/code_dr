@@ -259,7 +259,7 @@ pontoDePartidaUavNewDistace = np.zeros((len(linksDesastre), 50))
 pontoDePartidaUavNewDistaceNaive = np.zeros((len(linksDesastre), 50))
 
 n_segms = [30]
-num_episodes = 50000
+num_episodes = 250000
 learning_rate = 0.9
 discount_rate = 0.3
 allPaths = []
