@@ -88,7 +88,7 @@ class QL:
         self.max_exploration_rate = 1
         self.min_exploration_rate = 0.01
         self.exploration_decay_rate = 0.01
-
+        self.obst_fixed = []
         self.creatEnv(seed)
 
 
@@ -199,10 +199,11 @@ class QL:
 
             # 2 x obstacle
             # obst_fixed = [467,466,465,464,463,437,433,407,406,405,404,403,226,225,224,223,222,196,195,194,193,192,]
-            # Mult obstacles
-            obst_fixed = [621,619,617,615,613,611,609,561,559,557,555,553,551,549,501,499,497,495,493,491,489,441,439,437,435,433,431,429,381,379,377,375,373,371,369,321,319,317,315,313,311,309,261,259,257,255,253,251,249]
 
-        self.calcule_distancia_entre_obstaculos_fixos(obst_fixed)
+            # Mult obstacles
+            self.obst_fixed = [621,619,617,615,613,611,609,561,559,557,555,553,551,549,501,499,497,495,493,491,489,441,439,437,435,433,431,429,381,379,377,375,373,371,369,321,319,317,315,313,311,309,261,259,257,255,253,251,249]
+
+        self.calcule_distancia_entre_obstaculos_fixos(self.obst_fixed)
         self.calcular_distancia_para_o_taget()
         # Event wind and obst ===============================================
         a = 1000
@@ -212,9 +213,22 @@ class QL:
         # wind_high_speed = [807,805,803,801,799,797,795,747,745,743,741,739,737,735,687,685,683,681,679,677,675,627,625,623,621,619,617,615,567,565,563,561,559,557,555,507,505,503,501,499,497,495,447,445,443,441,439,437,435,387,385,383,381,379,377,375,327,325,323,321,319,317,315,267,265,263,261,259,257,255,207,205,203,201,199,197,195,147,145,143,141,139,137,135,87,85,83,81,79,77,75,]
 
         ## btw obstacles
-        wind_high_speed = [652,650,648,646,644,642,640,638,592,590,588,586,584,582,580,578,532,530,528,526,524,522,520,518,472,470,468,466,464,462,460,458,412,410,408,406,404,402,400,398,352,350,348,346,344,342,340,338,292,290,288,286,284,282,280,278,232,230,228,226,224,222,220,218,]
-        wind_to_matlab = []
-        a_file = open("wind_ambiente.txt", "w")
+        # wind_high_speed = [652,650,648,646,644,642,640,638,592,590,588,586,584,582,580,578,532,530,528,526,524,522,520,518,472,470,468,466,464,462,460,458,412,410,408,406,404,402,400,398,352,350,348,346,344,342,340,338,292,290,288,286,284,282,280,278,232,230,228,226,224,222,220,218,]
+
+        ## wind line
+        wind_high_speed = ['855,825,795,765,735,705,675,645,615,585,555,525,495,465,435,405,375,345,315,285,255,225,195,165,135,105,75,45,15']
+
+        #escolher pontos de obstaculos aleatoriamente (50%)
+        obstaculos_ale = self.np.random.choice(len(self.obst_fixed), int(len(self.obst_fixed)/2), replace=False)
+        aux_obs_fixed = []
+        for pos_obs in obstaculos_ale:
+            aux_obs_fixed.append(self.obst_fixed[pos_obs])
+        self.obst_fixed = aux_obs_fixed
+
+        # wind_high_speed = []
+
+        # wind_to_matlab = []
+        # a_file = open("wind_ambiente.txt", "w")
         for i in range(self.xdim * self.ydim):
             id_rand = self.np.random.randint(len(self.vetWind))
             self.env[i].obst_fixo = 0
@@ -226,7 +240,7 @@ class QL:
             else:
                 self.env[i].windSpeed = self.vetWind[id_rand]
 
-            wind_to_matlab.append(self.env[i].windSpeed)
+            # wind_to_matlab.append(self.env[i].windSpeed)
             self.env[i].r = \
                 self.calcula_diferenca_entre_pos_anteria_pos_atual_para_o_target(a, b, c, self.env[i].actions,
                                                                                            self.env[i].dist_from_target,
@@ -234,9 +248,9 @@ class QL:
                                                                                            (self.vetWind[10] - self.env[i].windSpeed )
                                                                                  )
 
-        np.savetxt(a_file, wind_to_matlab)
-        a_file.close()
-        for ob in obst_fixed:
+        # np.savetxt(a_file, wind_to_matlab)
+        # a_file.close()
+        for ob in self.obst_fixed:
             self.env[ob].obst_fixo = 1
         # Defina
         # Find grid target =====================================================
@@ -362,6 +376,12 @@ class QL:
 
                     break
                 stAux = st
+
+            #verficar se bateu
+            for obs in self.obst_fixed:
+                if obs in storeSt:
+                    fail = True
+                    break
             #print('quantity steps:', stp)
-            #print('path to objective point:', storeSt)
+            # print('path to objective point:', self.obst_fixed)
             return storeSt, fail

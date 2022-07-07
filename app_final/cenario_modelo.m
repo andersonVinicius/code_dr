@@ -1,4 +1,4 @@
-n=4;
+n=5;
 [path_uav, path_uav_egreedy, path_uav_sarsa, tipo_vento, tipo_obstaculo] = obter_path_para_cada_experimento(n);
 load(obter_points_alta_velo_vento(tipo_vento));
 cenario = tipo_obstaculo;
@@ -13,7 +13,7 @@ hold(axes1,'on');
 
 % subplot1 = subplot(9,2,[1 2 3 4],'Parent',figure1);
 % hold(subplot1,'on');
-title('UAV path obstacle [Multi obstacle]');
+title(strcat('Scenario[',num2str(n),']'));
 A = obter_posicao_obstaculos(cenario);
 
 h=surface(A,'Parent',axes1,'DisplayName','');

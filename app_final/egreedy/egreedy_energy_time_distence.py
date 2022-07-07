@@ -287,7 +287,7 @@ n_segms = [30]
 meanConsumerQLe = []
 meanTimeOperationQLe = []
 
-num_episodes = 250000
+num_episodes = 35000
 learning_rate = 0.9
 discount_rate = 0.3
 
@@ -345,8 +345,12 @@ for n_segm in n_segms:
                             limit = nextMov
 
                         print("NEW PATH:", path)
-                    plt.plot(egreedy_deltas)
-                    plt.show()
+                    # scn = 6
+                    # np.savetxt("../data_egreedy/" + str(n_segm) + "_x_" + str(n_segm) + "_delta_for_ep_scn"+str(scn)+".csv",
+                    #            egreedy_deltas, delimiter=";")
+
+                    # plt.plot(egreedy_deltas)
+                    # plt.show()
 
                     # leia e armazene os dados da altura e da velocidade do vento (Otimizado)
                     for p in path:

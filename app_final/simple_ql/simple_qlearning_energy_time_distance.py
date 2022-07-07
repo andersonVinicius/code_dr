@@ -258,9 +258,9 @@ pontoDePartidaUavNewDistace = np.zeros((len(linksDesastre), 50))
 pontoDePartidaUavNewDistaceNaive = np.zeros((len(linksDesastre), 50))
 
 n_segms = [30]
-num_episodes = 250000
+num_episodes = 35000
 learning_rate = 0.9
-discount_rate = 0.5
+discount_rate = 0.2
 allPaths = []
 # allPaths.append(zeroPaths)
 # =====================================================================
@@ -291,8 +291,16 @@ for n_segm in n_segms:
                     # retorne o caminho e a falha ao encontrar uma rota valida
                     path, fail = ql.findPath(egreedy_q_table, ql.init_space, ql.state_obj)
                     print(path, "sts fail:", fail)
-                    plt.plot( egreedy_deltas )
-                    plt.show()
+
+                    # np.savetxt("../data_simple_ql/" + str(n_segm) + "_x_" + str(n_segm) + "_steps_for_ep_scn1.csv",
+                    #            egreedy_list_epsForsteps, delimiter=";")
+                    # scn = 6
+                    # np.savetxt("../data_simple_ql/" + str(n_segm) + "_x_" + str(n_segm) + "_delta_for_ep_scn"+str(scn)+".csv",
+                    #            egreedy_deltas, delimiter=";")
+
+
+                    # plt.plot( egreedy_deltas )
+                    # plt.show()
                     if fail == True:
                         path = []
                         # leitura do caminho naive
@@ -338,8 +346,8 @@ for n_segm in n_segms:
                 consumerEnergyUavForMissionQLe[i, j] = energyCons2(payload, g, d, vUav, vp) / 1000
 
     # #save Sarsa otimizado --------------->
-    # np.savetxt("../data_simple_ql/"+str(n_segm)+"_x_"+str(n_segm)+"_pontoDePartidaUavWindSpeedSarsa.csv", pontoDePartidaUavWindSpeed, delimiter=";")
-    # np.savetxt("../data_simple_ql/"+str(n_segm)+"_x_"+str(n_segm)+"_pontoDePartidaUavNewDistaceSarsa.csv", pontoDePartidaUavNewDistace, delimiter=";")
-    # np.savetxt("../data_simple_ql/"+str(n_segm)+"_x_"+str(n_segm)+"_consumerEnergyUavForMissionQLeSarsa.csv", consumerEnergyUavForMissionQLe, delimiter=";")
+    np.savetxt("../data_simple_ql/"+str(n_segm)+"_x_"+str(n_segm)+"_pontoDePartidaUavWindSpeedSarsa.csv", pontoDePartidaUavWindSpeed, delimiter=";")
+    np.savetxt("../data_simple_ql/"+str(n_segm)+"_x_"+str(n_segm)+"_pontoDePartidaUavNewDistaceSarsa.csv", pontoDePartidaUavNewDistace, delimiter=";")
+    np.savetxt("../data_simple_ql/"+str(n_segm)+"_x_"+str(n_segm)+"_consumerEnergyUavForMissionQLeSarsa.csv", consumerEnergyUavForMissionQLe, delimiter=";")
 #
 

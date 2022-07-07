@@ -259,9 +259,9 @@ pontoDePartidaUavNewDistace = np.zeros((len(linksDesastre), 50))
 pontoDePartidaUavNewDistaceNaive = np.zeros((len(linksDesastre), 50))
 
 n_segms = [30]
-num_episodes = 250000
-learning_rate = 0.9
-discount_rate = 0.3
+num_episodes = 35000
+learning_rate = 0.8
+discount_rate = 0.4
 allPaths = []
 # allPaths.append(zeroPaths)
 # =====================================================================
@@ -303,8 +303,12 @@ for n_segm in n_segms:
                             limit = nextMov
 
                         print("NEW PATH:", path)
-                    plt.plot(egreedy_deltas)
-                    plt.show()
+
+                    # scn = 6
+                    # np.savetxt("../data_sarsa/" + str(n_segm) + "_x_" + str(n_segm) + "_delta_for_ep_scn"+str(scn)+".csv",
+                    #            egreedy_deltas, delimiter=";")
+                    # plt.plot(egreedy_deltas)
+                    # plt.show()
                     zeroPaths = np.zeros(50)
                     zeroPaths[0:len(path)] = path
                     allPaths.append(zeroPaths)

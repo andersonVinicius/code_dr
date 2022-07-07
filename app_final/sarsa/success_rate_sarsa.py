@@ -260,15 +260,15 @@ pontoDePartidaUavWindSpeedNaive = np.zeros((len(linksDesastre), 50))
 pontoDePartidaUavNewDistace = np.zeros((len(linksDesastre), 50))
 pontoDePartidaUavNewDistaceNaive = np.zeros((len(linksDesastre), 50))
 
-n_segms = [5, 10, 15, 20]
-num_episodes = [2500]
-conj_learning_rate = [0.8]
-conj_discount_rate = [0.1]
+n_segms = [30]
+num_episodes = [20000]
+conj_learning_rate = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+conj_discount_rate = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 allPaths = []
 # allPaths.append(zeroPaths)
 # =====================================================================
-quant_uavs_service = len(pontoDePartidaUavDistance[0, :])
-# quant_uavs_service = 1
+# quant_uavs_service = len(pontoDePartidaUavDistance[0, :])
+quant_uavs_service = 1
 quant_links_broke = len(pontoDePartidaUavDistance[0:1, 0])
 all_sts = []
 # all_sts.append(['n_segmentos', 'num_episodes', 'learning_rate', 'discount_rate','sarsa fail'])
@@ -289,6 +289,7 @@ for n_segm in n_segms:
                             sumPath = 0
                             d = 0
                             dNaive = 0
+                            segm=1
                             for z in range(segm):
                                 # print(f'segmento: {z}')
                                 # criar instancia do Objeto Sarsa
@@ -318,18 +319,19 @@ for n_segm in n_segms:
                                 # path_egreedy, fail_egreedy = ql.findPath(egreedy_q_table, ql.init_space, ql.state_obj)
                                 # n_segmentos | num_episodes | learning_rate | discount_rate | egreedy fail | sarsa fail | simple q-learning fail|
                                 vet_estatistica = [n_segm, num_episodes, learning_rate, discount_rate, fail_sarsa]
-                                info = ['id_uav', 'n_segmentos','num_episodes', 'learning_rate', 'discount_rate', 'fail']
+                                info = ['id_uav', 'n_segmentos','num_episodes', 'learning_rate', 'discount_rate', 'fail', 'path']
                                 dict_row = {
                                     'id_uav': j,
                                     'n_segmentos': n_segm,
                                     'num_episodes': n_ep,
                                     'learning_rate': learning_rate,
                                     'discount_rate': discount_rate,
-                                    'fail': fail_sarsa
+                                    'fail': fail_sarsa,
+                                    'path': path_sarsa
                                 }
 
                                 all_sts.append(dict_row)
-                                with open('../data_sarsa/'+str(n_segm)+'_x_'+str(n_segm)+'_'+str(n_ep)+'_'+str(learning_rate)+'_'+str(discount_rate)+'sarsa_estatistica_ml.csv', 'w') as csvfile:
+                                with open('../data_sarsa/'+str(n_segm)+'_x_'+str(n_segm)+'_'+str(n_ep)+'learning_rate_x_discount_rate_sarsa_estatistica_ml_cenario_6.csv', 'w') as csvfile:
                                     writer = csv.DictWriter(csvfile, fieldnames=info)
                                     writer.writeheader()
                                     writer.writerows(all_sts)
